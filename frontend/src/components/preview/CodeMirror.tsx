@@ -46,7 +46,7 @@ function CodeMirror({ code, editorTheme, onCodeChange }: Props) {
           }),
         ],
       }),
-    [editorTheme]
+    [editorTheme, onCodeChange]
   );
   useEffect(() => {
     view.current = new EditorView({
@@ -60,7 +60,7 @@ function CodeMirror({ code, editorTheme, onCodeChange }: Props) {
         view.current = null;
       }
     };
-  }, []);
+  }, [editorState]);
 
   useEffect(() => {
     if (view.current && view.current.state.doc.toString() !== code) {
@@ -68,7 +68,7 @@ function CodeMirror({ code, editorTheme, onCodeChange }: Props) {
         changes: { from: 0, to: view.current.state.doc.length, insert: code },
       });
     }
-  }, [code]);
+  }, [code, editorState]);
 
   return (
     <div

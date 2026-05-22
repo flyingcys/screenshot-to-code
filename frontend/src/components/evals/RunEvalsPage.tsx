@@ -5,6 +5,7 @@ import { HTTP_BACKEND_URL } from "../../config";
 import { BsCheckLg, BsChevronDown, BsChevronRight } from "react-icons/bs";
 import InputFileSelector from "./InputFileSelector";
 import EvalNavigation from "./EvalNavigation";
+import { useI18n } from "../../lib/i18n";
 
 interface ModelResponse {
   models: string[];
@@ -38,6 +39,7 @@ interface FailedTask {
 }
 
 function RunEvalsPage() {
+  const { t } = useI18n();
   const faviconFlashIntervalRef = useRef<number | null>(null);
   const [isRunning, setIsRunning] = useState(false);
   const [models, setModels] = useState<string[]>([]);
@@ -50,7 +52,7 @@ function RunEvalsPage() {
   const [completedTasks, setCompletedTasks] = useState(0);
   const [totalTasks, setTotalTasks] = useState(0);
   const [currentModel, setCurrentModel] = useState<string>("");
-  const [statusMessage, setStatusMessage] = useState<string>("Idle");
+  const [statusMessage, setStatusMessage] = useState<string>(t("evals.run.idle"));
   const [lastProcessedFile, setLastProcessedFile] = useState<string>("");
   const [failedTasks, setFailedTasks] = useState(0);
   const [failedTaskDetails, setFailedTaskDetails] = useState<FailedTask[]>([]);
@@ -68,7 +70,7 @@ function RunEvalsPage() {
 
   useEffect(() => {
     return () => {
-      document.title = "Screenshot to Code";
+      document.title = "截图转代码";
       if (faviconFlashIntervalRef.current !== null) {
         window.clearInterval(faviconFlashIntervalRef.current);
       }
@@ -114,20 +116,20 @@ function RunEvalsPage() {
   const runEvals = async (filesToRun?: string[]) => {
     const updateRunningTitle = (completed: number, total: number) => {
       if (total <= 0) {
-        document.title = "Running Evals...";
+        document.title = t("evals.run.title");
         return;
       }
       const percent = Math.round((completed / total) * 100);
-      document.title = `(${percent}%) Running Evals...`;
+      document.title = `(${percent}%) ${t("evals.run.title")}`;
     };
 
     try {
       setIsRunning(true);
-      document.title = "Running Evals...";
+      document.title = t("evals.run.title");
       setCompletedTasks(0);
       setTotalTasks(0);
       setCurrentModel("");
-      setStatusMessage("Preparing evaluation run...");
+      setStatusMessage(t("evals.run.preparing"));
       setLastProcessedFile("");
       setFailedTasks(0);
       setFailedTaskDetails([]);
@@ -150,11 +152,11 @@ function RunEvalsPage() {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to run evals");
+        throw new Error(t("evals.run.failedRun"));
       }
 
       if (!response.body) {
-        throw new Error("No progress stream available");
+        throw new Error(t("evals.run.failedRun"));
       }
 
       const reader = response.body.getReader();
@@ -184,18 +186,26 @@ function RunEvalsPage() {
             setSkippedExistingTasks(event.total_skipped_existing ?? 0);
             setStatusMessage(
               event.diff_mode
-                ? `Starting diff run (${event.total_skipped_existing ?? 0} existing outputs skipped)...`
-                : "Starting evaluation run..."
+                ? t("evals.run.startDiff").replace("{count}", String(event.total_skipped_existing ?? 0))
+                : t("evals.run.startRun")
             );
             updateRunningTitle(0, eventTotalTasks);
           } else if (event.type === "model_start") {
             if (event.model) setCurrentModel(event.model);
             setStatusMessage(
-              `Running model ${event.model_index ?? 1}/${event.total_models ?? selectedModels.length}: ${event.model ?? "Unknown"}${
-                diffMode && (event.model_skipped_existing ?? 0) > 0
-                  ? ` (${event.model_skipped_existing} skipped)`
-                  : ""
-              }`
+              t("evals.run.runningModel")
+                .replace("{index}", String(event.model_index ?? 1))
+                .replace("{total}", String(event.total_models ?? selectedModels.length))
+                .replace("{model}", event.model ?? "Unknown")
+                .replace(
+                  "{suffix}",
+                  diffMode && (event.model_skipped_existing ?? 0) > 0
+                    ? t("evals.run.skippedSuffix").replace(
+                        "{count}",
+                        String(event.model_skipped_existing)
+                      )
+                    : ""
+                )
             );
           } else if (event.type === "task_complete") {
             const globalCompleted = event.global_completed_tasks ?? 0;
@@ -215,8 +225,8 @@ function RunEvalsPage() {
             }
             setStatusMessage(
               event.success === false
-                ? `Failed: ${event.input_file ?? "unknown file"}`
-                : `Processed: ${event.input_file ?? "unknown file"}`
+                ? t("evals.run.failedStatus").replace("{file}", event.input_file ?? "unknown file")
+                : t("evals.run.processed").replace("{file}", event.input_file ?? "unknown file")
             );
             updateRunningTitle(globalCompleted, globalTotal);
           } else if (event.type === "complete") {
@@ -224,24 +234,24 @@ function RunEvalsPage() {
             const finalTotal = event.total_tasks ?? totalTasks;
             setCompletedTasks(finalCompleted);
             setTotalTasks(finalTotal);
-            setStatusMessage("Evaluation run complete");
+            setStatusMessage(t("evals.run.complete"));
             console.log("Generated files:", event.output_files ?? []);
             updateRunningTitle(finalCompleted, finalTotal);
           } else if (event.type === "error") {
-            throw new Error(event.message ?? "Eval run failed");
+            throw new Error(event.message ?? t("evals.run.failedRun"));
           }
         }
       }
 
-      document.title = "✓ Evals Complete";
+      document.title = t("evals.run.completeTitle");
       flashFaviconOnComplete();
     } catch (error) {
       console.error("Error running evals:", error);
-      document.title = "❌ Eval Error";
-      setStatusMessage("Evaluation run failed");
+      document.title = t("evals.run.errorTitle");
+      setStatusMessage(t("evals.run.failedRun"));
       flashFaviconOnComplete();
       setTimeout(() => {
-        document.title = "Screenshot to Code";
+        document.title = "截图转代码";
       }, 5000);
     } finally {
       setIsRunning(false);
@@ -267,10 +277,10 @@ function RunEvalsPage() {
 
   // Format model list for display in the summary
   const formatModelList = () => {
-    if (selectedModels.length === 0) return "None";
+    if (selectedModels.length === 0) return t("evals.run.noModelSelected");
     if (selectedModels.length === 1) return selectedModels[0];
     if (selectedModels.length <= 2) return selectedModels.join(", ");
-    return `${selectedModels.slice(0, 2).join(", ")} +${selectedModels.length - 2} more`;
+    return `${selectedModels.slice(0, 2).join(", ")} +${selectedModels.length - 2} ${t("common.more")}`;
   };
 
   const canRunEvals = selectedModels.length > 0 && selectedFiles.length > 0;
@@ -292,37 +302,37 @@ function RunEvalsPage() {
         <div className="mb-6 bg-white rounded-lg border border-gray-200 shadow-sm p-4 max-w-5xl mx-auto">
           <div className="flex flex-col gap-4">
             <div className="flex flex-wrap justify-between items-center">
-              <h1 className="text-2xl font-bold">Run Evaluations</h1>
+              <h1 className="text-2xl font-bold">{t("evals.run.title")}</h1>
               
               <Button
                 onClick={() => void runEvals()}
                 disabled={isRunning || !canRunEvals}
                 className={`min-w-[120px] ${isRunning ? "bg-blue-400" : "bg-blue-600 hover:bg-blue-700"}`}
               >
-                {isRunning ? "Running..." : "Run Evals"}
+                {isRunning ? t("evals.run.running") : t("evals.run.run")}
               </Button>
             </div>
 
             {diffMode && (
               <div className="rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-800">
-                Diff mode enabled: only input files missing outputs in today's model folders will run. Existing outputs are skipped and never overwritten.
+                {t("evals.run.diffModeNotice")}
               </div>
             )}
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3 border-t border-gray-100 pt-3">
               <div className="flex flex-col">
-                <span className="text-sm font-medium text-gray-700">Models</span>
+                <span className="text-sm font-medium text-gray-700">{t("evals.run.models")}</span>
                 <span className="text-sm text-gray-600 font-mono">{formatModelList()}</span>
               </div>
               
               <div className="flex flex-col">
-                <span className="text-sm font-medium text-gray-700">Stack</span>
+                <span className="text-sm font-medium text-gray-700">{t("evals.run.stack")}</span>
                 <span className="text-sm text-gray-600 font-mono">{selectedStack}</span>
               </div>
               
               <div className="flex flex-col">
-                <span className="text-sm font-medium text-gray-700">Input Files</span>
-                <span className="text-sm text-gray-600">{selectedFiles.length} selected</span>
+                <span className="text-sm font-medium text-gray-700">{t("evals.run.inputFiles")}</span>
+                <span className="text-sm text-gray-600">{t("evals.run.selectedCount").replace("{count}", String(selectedFiles.length))}</span>
               </div>
             </div>
             
@@ -331,19 +341,19 @@ function RunEvalsPage() {
               onClick={() => setShowPaths(!showPaths)}
             >
               {showPaths ? <BsChevronDown size={12} /> : <BsChevronRight size={12} />}
-              <span className="font-medium">Paths</span>
+              <span className="font-medium">{t("evals.run.paths")}</span>
             </div>
             
             {showPaths && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs text-gray-600 mt-2 bg-gray-50 p-2 rounded-md">
                 <div>
-                  <span className="font-medium">Input path:</span>
+                  <span className="font-medium">{t("evals.run.inputPath")}</span>
                   <code className="ml-2 bg-gray-100 px-2 py-0.5 rounded">
                     backend/evals_data/inputs
                   </code>
                 </div>
                 <div>
-                  <span className="font-medium">Output path:</span>
+                  <span className="font-medium">{t("evals.run.outputPath")}</span>
                   <code className="ml-2 bg-gray-100 px-2 py-0.5 rounded">
                     backend/evals_data/outputs
                   </code>
@@ -356,26 +366,26 @@ function RunEvalsPage() {
                 <div className="flex items-center justify-between text-sm mb-2">
                   <span className="font-medium text-gray-700">{statusMessage}</span>
                   <span className="text-gray-600">
-                    {completedTasks} / {totalTasks || "?"} tasks
+                    {completedTasks} / {totalTasks || "?"} {t("common.tasks")}
                   </span>
                 </div>
                 <Progress value={progressPercent} className="h-2 mb-2" />
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-xs text-gray-600">
                   <span>
-                    Current model:{" "}
+                    {t("evals.run.currentModel")}{" "}
                     <span className="font-mono">{currentModel || "-"}</span>
                   </span>
                   <span>
-                    Failures: <span className="font-medium">{failedTasks}</span>
+                    {t("evals.run.failures")} <span className="font-medium">{failedTasks}</span>
                   </span>
                   <span className="truncate" title={lastProcessedFile}>
-                    Last file:{" "}
+                    {t("evals.run.lastFile")}{" "}
                     <span className="font-mono">{lastProcessedFile || "-"}</span>
                   </span>
                 </div>
                 {diffMode && (
                   <div className="mt-2 text-xs text-emerald-700">
-                    Existing outputs skipped:{" "}
+                    {t("evals.run.existingSkipped")}{" "}
                     <span className="font-medium">{skippedExistingTasks}</span>
                   </div>
                 )}
@@ -383,7 +393,7 @@ function RunEvalsPage() {
                   <div className="mt-3 border-t border-gray-100 pt-3">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-sm font-medium text-red-700">
-                        Failures ({failedTaskDetails.length})
+                        {t("evals.run.failureCount").replace("{count}", String(failedTaskDetails.length))}
                       </span>
                       <Button
                         variant="outline"
@@ -392,7 +402,7 @@ function RunEvalsPage() {
                         onClick={() => void runEvals(failedFilesForRerun)}
                         className="h-7 px-2 text-xs"
                       >
-                        Re-run failures
+                        {t("evals.run.rerunFailures")}
                       </Button>
                     </div>
                     <div className="max-h-40 overflow-y-auto rounded-md border border-red-100 bg-red-50/40">
@@ -403,10 +413,10 @@ function RunEvalsPage() {
                               {task.inputFile}
                             </div>
                             <div className="text-red-700">
-                              Model: <span className="font-mono">{task.model}</span>
+                              {t("evals.run.models")}: <span className="font-mono">{task.model}</span>
                             </div>
                             <div className="text-red-700 break-words">
-                              Error: {task.error}
+                              {t("common.error")}：{task.error}
                             </div>
                           </li>
                         ))}
@@ -424,7 +434,7 @@ function RunEvalsPage() {
           {/* Model Selection Section */}
           <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
             <div className="border-b border-gray-200 px-4 py-3 bg-gray-50 rounded-t-lg">
-              <h2 className="font-medium">Select Models</h2>
+              <h2 className="font-medium">{t("evals.run.selectModels")}</h2>
             </div>
             <div className="p-3">
               <div className="border rounded-md max-h-[300px] overflow-y-auto">
@@ -451,7 +461,10 @@ function RunEvalsPage() {
               </div>
               <div className="flex justify-between mt-2 text-xs">
                 <p className="text-gray-500">
-                  Selected: {selectedModels.length} / {models.length}
+                  {t("evals.run.selectedCount")
+                    .replace("{count}", String(selectedModels.length))}
+                  {" / "}
+                  {models.length}
                 </p>
                 <div className="space-x-2">
                   {selectedModels.length < models.length && (
@@ -461,7 +474,7 @@ function RunEvalsPage() {
                       onClick={handleSelectAll}
                       className="text-xs h-6 px-2 text-gray-500 hover:text-gray-700"
                     >
-                      Select all
+                      {t("evals.run.selectAll")}
                     </Button>
                   )}
                   {selectedModels.length > 0 && (
@@ -471,7 +484,7 @@ function RunEvalsPage() {
                       onClick={() => setSelectedModels([])}
                       className="text-xs h-6 px-2 text-gray-500 hover:text-gray-700"
                     >
-                      Clear
+                      {t("evals.run.clear")}
                     </Button>
                   )}
                 </div>
@@ -482,7 +495,7 @@ function RunEvalsPage() {
           {/* Stack Selection Section */}
           <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
             <div className="border-b border-gray-200 px-4 py-3 bg-gray-50 rounded-t-lg">
-              <h2 className="font-medium">Select Stack</h2>
+              <h2 className="font-medium">{t("evals.run.selectStack")}</h2>
             </div>
             <div className="p-3">
               <select
@@ -503,7 +516,7 @@ function RunEvalsPage() {
                   onChange={(e) => setDiffMode(e.target.checked)}
                   className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                 />
-                <span>Diff mode (only run missing outputs, no overwrite)</span>
+                <span>{t("evals.run.diffMode")}</span>
               </label>
             </div>
           </div>
@@ -511,7 +524,7 @@ function RunEvalsPage() {
           {/* Input Files Section */}
           <div className="bg-white rounded-lg border border-gray-200 shadow-sm lg:col-span-1 md:col-span-2">
             <div className="border-b border-gray-200 px-4 py-3 bg-gray-50 rounded-t-lg">
-              <h2 className="font-medium">Select Input Files</h2>
+              <h2 className="font-medium">{t("evals.run.selectInputFiles")}</h2>
             </div>
             <div className="p-3">
               <InputFileSelector onFilesSelected={handleFilesSelected} />

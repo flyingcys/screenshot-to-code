@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { HTTP_BACKEND_URL } from "../../config";
 import { Dialog, DialogContent, DialogTrigger } from "../ui/dialog";
 import EvalNavigation from "./EvalNavigation";
+import { useI18n } from "../../lib/i18n";
 
 interface Eval {
   input: string;
@@ -17,6 +18,7 @@ interface PairwiseEvalsResponse {
 }
 
 function PairwiseEvalsPage() {
+  const { t } = useI18n();
   const [evals, setEvals] = React.useState<Eval[]>([]);
   const [outcomes, setOutcomes] = React.useState<Outcome[]>([]);
   const [folderNames, setFolderNames] = useState<{
@@ -49,7 +51,7 @@ function PairwiseEvalsPage() {
 
   const loadEvals = async () => {
     if (!folder1Path || !folder2Path) {
-      alert("Please enter both folder paths");
+      alert(t("evals.pairwise.enterPaths"));
       return;
     }
 
@@ -73,9 +75,7 @@ function PairwiseEvalsPage() {
       });
     } catch (error) {
       console.error("Error loading evals:", error);
-      alert(
-        "Error loading evals. Please check the folder paths and try again."
-      );
+      alert(t("evals.run.failedRun"));
     } finally {
       setIsLoading(false);
     }
@@ -96,14 +96,14 @@ function PairwiseEvalsPage() {
             type="text"
             value={folder1Path}
             onChange={(e) => setFolder1Path(e.target.value)}
-            placeholder="Enter folder name in Downloads"
+            placeholder={t("evals.pairwise.inputPlaceholder")}
             className="w-full px-4 py-2 rounded text-black"
           />
           <input
             type="text"
             value={folder2Path}
             onChange={(e) => setFolder2Path(e.target.value)}
-            placeholder="Enter folder name in Downloads"
+            placeholder={t("evals.pairwise.inputPlaceholder")}
             className="w-full px-4 py-2 rounded text-black"
           />
           <button
@@ -111,24 +111,34 @@ function PairwiseEvalsPage() {
             disabled={isLoading}
             className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded disabled:bg-blue-300"
           >
-            {isLoading ? "Loading..." : "Start Comparison"}
+            {isLoading ? t("evals.pairwise.loading") : t("evals.pairwise.start")}
           </button>
         </div>
 
         {evals.length > 0 && (
           <>
             <span className="text-2xl font-semibold">
-              Total votes: {totalVotes}
+              {t("evals.pairwise.totalVotes").replace("{count}", String(totalVotes))}
             </span>
             <div className="text-lg mt-2">
               <span>
-                {folderNames.left}: {leftWins} ({leftPercentage}%) |{" "}
+                {t("evals.pairwise.leftWins")
+                  .replace("{name}", folderNames.left)
+                  .replace("{count}", String(leftWins))
+                  .replace("{percentage}", leftPercentage)}{" "}
+                |{" "}
               </span>
               <span>
-                {folderNames.right}: {rightWins} ({rightPercentage}%) |{" "}
+                {t("evals.pairwise.rightWins")
+                  .replace("{name}", folderNames.right)
+                  .replace("{count}", String(rightWins))
+                  .replace("{percentage}", rightPercentage)}{" "}
+                |{" "}
               </span>
               <span>
-                Ties: {ties} ({tiePercentage}%)
+                {t("evals.pairwise.ties")
+                  .replace("{count}", String(ties))
+                  .replace("{percentage}", tiePercentage)}
               </span>
             </div>
           </>
@@ -139,12 +149,15 @@ function PairwiseEvalsPage() {
         {evals.map((e, index) => (
           <div className="flex flex-col justify-center" key={index}>
             <h2 className="font-bold text-lg ml-4 mb-2">
-              Comparison {index + 1}
+              {t("evals.pairwise.comparison").replace("{index}", String(index + 1))}
             </h2>
 
             <div className="w-full flex justify-center mb-4">
               <div className="w-1/2 p-1 border">
-                <img src={e.input} alt={`Input for comparison ${index}`} />
+                <img
+                  src={e.input}
+                  alt={t("evals.pairwise.comparison").replace("{index}", String(index + 1))}
+                />
               </div>
             </div>
 
@@ -170,7 +183,7 @@ function PairwiseEvalsPage() {
                           className="absolute top-2 right-2 bg-blue-500 text-white px-2 py-1 rounded text-sm"
                           onClick={() => setSelectedHtml(output)}
                         >
-                          Full Screen
+                        {t("evals.pairwise.fullScreen")}
                         </button>
                       </DialogTrigger>
                       <DialogContent className="w-[95vw] max-w-[95vw] h-[95vh] max-h-[95vh]">
@@ -194,7 +207,7 @@ function PairwiseEvalsPage() {
                 }`}
                 onClick={() => handleVote(index, "left")}
               >
-                Left Wins
+                {t("evals.pairwise.leftWinsButton")}
               </button>
               <button
                 className={`px-4 py-2 rounded ${
@@ -204,7 +217,7 @@ function PairwiseEvalsPage() {
                 }`}
                 onClick={() => handleVote(index, "tie")}
               >
-                Tie
+                {t("evals.pairwise.tieButton")}
               </button>
               <button
                 className={`px-4 py-2 rounded ${
@@ -214,7 +227,7 @@ function PairwiseEvalsPage() {
                 }`}
                 onClick={() => handleVote(index, "right")}
               >
-                Right Wins
+                {t("evals.pairwise.rightWinsButton")}
               </button>
             </div>
           </div>

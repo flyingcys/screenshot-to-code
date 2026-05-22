@@ -1,0 +1,161 @@
+INFO:     Will watch for changes in these directories: ['/Users/cys/ai-coding/screenshot-to-code/backend']
+INFO:     Uvicorn running on http://0.0.0.0:7001 (Press CTRL+C to quit)
+INFO:     Started reloader process [44948] using StatReload
+INFO:     Started server process [44955]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [44955]
+Backend startup complete. Debug mode is DISABLED.
+INFO:     Stopping reloader process [44948]
+INFO:     Will watch for changes in these directories: ['/Users/cys/ai-coding/screenshot-to-code/backend']
+INFO:     Uvicorn running on http://0.0.0.0:7001 (Press CTRL+C to quit)
+INFO:     Started reloader process [46106] using StatReload
+INFO:     Started server process [46115]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Will watch for changes in these directories: ['/Users/cys/ai-coding/screenshot-to-code/backend']
+INFO:     Uvicorn running on http://0.0.0.0:7001 (Press CTRL+C to quit)
+INFO:     Started reloader process [57276] using StatReload
+INFO:     Started server process [57283]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Will watch for changes in these directories: ['/Users/cys/ai-coding/screenshot-to-code/backend']
+INFO:     Uvicorn running on http://0.0.0.0:7001 (Press CTRL+C to quit)
+INFO:     Started reloader process [67764] using StatReload
+INFO:     Started server process [67773]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Will watch for changes in these directories: ['/Users/cys/ai-coding/screenshot-to-code/backend']
+INFO:     Uvicorn running on http://0.0.0.0:7001 (Press CTRL+C to quit)
+INFO:     Started reloader process [67932] using StatReload
+INFO:     Started server process [67939]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+Backend startup complete. Debug mode is DISABLED.
+INFO:     127.0.0.1:59897 - "HEAD / HTTP/1.1" 405 Method Not Allowed
+INFO:     127.0.0.1:60310 - "HEAD / HTTP/1.1" 405 Method Not Allowed
+WARNING:  StatReload detected changes in 'routes/generate_code.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [67939]
+INFO:     Started server process [60121]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'routes/generate_code.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [60121]
+Backend startup complete. Debug mode is DISABLED.
+INFO:     Started server process [66126]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'routes/generate_code.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [66126]
+Backend startup complete. Debug mode is DISABLED.
+INFO:     Started server process [68383]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'tests/test_parameter_extraction_stage.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [68383]
+Backend startup complete. Debug mode is DISABLED.
+INFO:     Started server process [71405]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'tests/test_model_selection.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [71405]
+Backend startup complete. Debug mode is DISABLED.
+INFO:     Started server process [75664]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'routes/generate_code.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [75664]
+Backend startup complete. Debug mode is DISABLED.
+INFO:     Started server process [77481]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'tests/test_model_selection.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [77481]
+Backend startup complete. Debug mode is DISABLED.
+INFO:     Started server process [77561]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'tests/test_model_selection.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [77561]
+Backend startup complete. Debug mode is DISABLED.
+INFO:     Started server process [78216]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'routes/generate_code.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [78216]
+Backend startup complete. Debug mode is DISABLED.
+Process SpawnProcess-10:
+Traceback (most recent call last):
+  File "/Users/cys/.local/share/uv/python/cpython-3.10.19-macos-aarch64-none/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/Users/cys/.local/share/uv/python/cpython-3.10.19-macos-aarch64-none/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/Users/cys/Library/Caches/pypoetry/virtualenvs/backend-wfgHDHXq-py3.10/lib/python3.10/site-packages/uvicorn/_subprocess.py", line 76, in subprocess_started
+    target(sockets=sockets)
+  File "/Users/cys/Library/Caches/pypoetry/virtualenvs/backend-wfgHDHXq-py3.10/lib/python3.10/site-packages/uvicorn/server.py", line 61, in run
+    return asyncio.run(self.serve(sockets=sockets))
+  File "/Users/cys/.local/share/uv/python/cpython-3.10.19-macos-aarch64-none/lib/python3.10/asyncio/runners.py", line 44, in run
+    return loop.run_until_complete(main)
+  File "/Users/cys/.local/share/uv/python/cpython-3.10.19-macos-aarch64-none/lib/python3.10/asyncio/base_events.py", line 649, in run_until_complete
+    return future.result()
+  File "/Users/cys/Library/Caches/pypoetry/virtualenvs/backend-wfgHDHXq-py3.10/lib/python3.10/site-packages/uvicorn/server.py", line 68, in serve
+    config.load()
+  File "/Users/cys/Library/Caches/pypoetry/virtualenvs/backend-wfgHDHXq-py3.10/lib/python3.10/site-packages/uvicorn/config.py", line 467, in load
+    self.loaded_app = import_from_string(self.app)
+  File "/Users/cys/Library/Caches/pypoetry/virtualenvs/backend-wfgHDHXq-py3.10/lib/python3.10/site-packages/uvicorn/importer.py", line 21, in import_from_string
+    module = importlib.import_module(module_str)
+  File "/Users/cys/.local/share/uv/python/cpython-3.10.19-macos-aarch64-none/lib/python3.10/importlib/__init__.py", line 126, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 1050, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1027, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1006, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 688, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 883, in exec_module
+  File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+  File "/Users/cys/ai-coding/screenshot-to-code/backend/main.py", line 10, in <module>
+    from routes import screenshot, generate_code, home, evals, export
+  File "/Users/cys/ai-coding/screenshot-to-code/backend/routes/generate_code.py", line 229, in <module>
+    class ExtractedParams:
+  File "/Users/cys/.local/share/uv/python/cpython-3.10.19-macos-aarch64-none/lib/python3.10/dataclasses.py", line 1184, in dataclass
+    return wrap(cls)
+  File "/Users/cys/.local/share/uv/python/cpython-3.10.19-macos-aarch64-none/lib/python3.10/dataclasses.py", line 1175, in wrap
+    return _process_class(cls, init, repr, eq, order, unsafe_hash,
+  File "/Users/cys/.local/share/uv/python/cpython-3.10.19-macos-aarch64-none/lib/python3.10/dataclasses.py", line 1024, in _process_class
+    _init_fn(all_init_fields,
+  File "/Users/cys/.local/share/uv/python/cpython-3.10.19-macos-aarch64-none/lib/python3.10/dataclasses.py", line 544, in _init_fn
+    raise TypeError(f'non-default argument {f.name!r} '
+TypeError: non-default argument 'generation_type' follows default argument
+WARNING:  StatReload detected changes in 'routes/generate_code.py'. Reloading...
+INFO:     Started server process [78395]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.

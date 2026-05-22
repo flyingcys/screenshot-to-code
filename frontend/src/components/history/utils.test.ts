@@ -66,7 +66,7 @@ const basicBranchingHistory: Record<CommitHash, Commit> = {
 
 describe("History Utils", () => {
   test("should correctly render the history tree", () => {
-    expect(renderHistory(Object.values(basicLinearHistory))).toEqual([
+    expect(renderHistory(Object.values(basicLinearHistory), "en")).toEqual([
       {
         ...basicLinearHistory["0"],
         type: "Create",
@@ -97,7 +97,7 @@ describe("History Utils", () => {
     ]);
 
     // Render a history with code
-    expect(renderHistory(Object.values(basicLinearHistoryWithCode))).toEqual([
+    expect(renderHistory(Object.values(basicLinearHistoryWithCode), "en")).toEqual([
       {
         ...basicLinearHistoryWithCode["0"],
         type: "Imported from code",
@@ -128,7 +128,7 @@ describe("History Utils", () => {
     ]);
 
     // Render a non-linear history
-    expect(renderHistory(Object.values(basicBranchingHistory))).toEqual([
+    expect(renderHistory(Object.values(basicBranchingHistory), "en")).toEqual([
       {
         ...basicBranchingHistory["0"],
         type: "Create",

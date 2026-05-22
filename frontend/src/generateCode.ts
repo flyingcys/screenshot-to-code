@@ -11,22 +11,56 @@ const ERROR_MESSAGE =
 
 const CANCEL_MESSAGE = "Code generation cancelled";
 
+type WebSocketResponseType =
+  | "chunk"
+  | "status"
+  | "setCode"
+  | "error"
+  | "variantComplete"
+  | "variantError"
+  | "variantCount"
+  | "variantModels"
+  | "thinking"
+  | "assistant"
+  | "toolStart"
+  | "toolResult";
+
+type VariantModelsPayload = {
+  models?: string[];
+};
+
+type ToolEventPayload = {
+  name?: string;
+  input?: unknown;
+};
+
+type ToolResultPayload = {
+  ok?: boolean;
+  output?: unknown;
+};
+
+function asVariantModelsPayload(
+  data: WebSocketResponse["data"]
+): VariantModelsPayload | undefined {
+  return data && "models" in data ? data : undefined;
+}
+
+function asToolEventPayload(
+  data: WebSocketResponse["data"]
+): ToolEventPayload | undefined {
+  return data && ("name" in data || "input" in data) ? data : undefined;
+}
+
+function asToolResultPayload(
+  data: WebSocketResponse["data"]
+): ToolResultPayload | undefined {
+  return data && ("ok" in data || "output" in data) ? data : undefined;
+}
+
 type WebSocketResponse = {
-  type:
-    | "chunk"
-    | "status"
-    | "setCode"
-    | "error"
-    | "variantComplete"
-    | "variantError"
-    | "variantCount"
-    | "variantModels"
-    | "thinking"
-    | "assistant"
-    | "toolStart"
-    | "toolResult";
+  type: WebSocketResponseType;
   value?: string;
-  data?: any;
+  data?: VariantModelsPayload | ToolEventPayload | ToolResultPayload;
   eventId?: string;
   variantIndex: number;
 };
@@ -41,8 +75,16 @@ interface CodeGenerationCallbacks {
   onVariantModels: (models: string[]) => void;
   onThinking: (content: string, variantIndex: number, eventId?: string) => void;
   onAssistant: (content: string, variantIndex: number, eventId?: string) => void;
-  onToolStart: (data: any, variantIndex: number, eventId?: string) => void;
-  onToolResult: (data: any, variantIndex: number, eventId?: string) => void;
+  onToolStart: (
+    data: ToolEventPayload | undefined,
+    variantIndex: number,
+    eventId?: string
+  ) => void;
+  onToolResult: (
+    data: ToolResultPayload | undefined,
+    variantIndex: number,
+    eventId?: string
+  ) => void;
   onCancel: (
     reason: "user_cancelled" | "request_failed" | "connection_error",
     errorMessage?: string
@@ -80,15 +122,23 @@ export function generateCode(
     } else if (response.type === "variantCount") {
       callbacks.onVariantCount(parseInt(response.value || "1"));
     } else if (response.type === "variantModels") {
-      callbacks.onVariantModels(response.data?.models || []);
+      callbacks.onVariantModels(asVariantModelsPayload(response.data)?.models || []);
     } else if (response.type === "thinking") {
       callbacks.onThinking(response.value || "", response.variantIndex, response.eventId);
     } else if (response.type === "assistant") {
       callbacks.onAssistant(response.value || "", response.variantIndex, response.eventId);
     } else if (response.type === "toolStart") {
-      callbacks.onToolStart(response.data, response.variantIndex, response.eventId);
+      callbacks.onToolStart(
+        asToolEventPayload(response.data),
+        response.variantIndex,
+        response.eventId
+      );
     } else if (response.type === "toolResult") {
-      callbacks.onToolResult(response.data, response.variantIndex, response.eventId);
+      callbacks.onToolResult(
+        asToolResultPayload(response.data),
+        response.variantIndex,
+        response.eventId
+      );
     } else if (response.type === "error") {
       console.error("Error generating code", response.value);
       toast.error(response.value || ERROR_MESSAGE);

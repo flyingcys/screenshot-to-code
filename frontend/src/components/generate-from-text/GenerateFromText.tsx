@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { Button } from "../ui/button";
 import { Textarea } from "../ui/textarea";
 import toast from "react-hot-toast";
+import { useI18n } from "../../lib/i18n";
 
 interface GenerateFromTextProps {
   doCreateFromText: (text: string) => void;
@@ -11,6 +12,7 @@ function GenerateFromText({ doCreateFromText }: GenerateFromTextProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [text, setText] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const { t } = useI18n();
 
   useEffect(() => {
     if (isOpen && textareaRef.current) {
@@ -20,7 +22,7 @@ function GenerateFromText({ doCreateFromText }: GenerateFromTextProps) {
 
   const handleGenerate = () => {
     if (text.trim() === "") {
-      toast.error("Please enter a prompt to generate from");
+      toast.error(t("textTab.enterDescription"));
       return;
     }
     doCreateFromText(text);
@@ -38,7 +40,7 @@ function GenerateFromText({ doCreateFromText }: GenerateFromTextProps) {
       {!isOpen ? (
         <div className="flex justify-center">
           <Button variant="secondary" onClick={() => setIsOpen(true)}>
-            Generate from text prompt [BETA]
+            {t("textTab.generateFromText")} ({t("common.beta")})
           </Button>
         </div>
       ) : (
@@ -46,7 +48,7 @@ function GenerateFromText({ doCreateFromText }: GenerateFromTextProps) {
           <Textarea
             ref={textareaRef}
             rows={2}
-            placeholder="A SaaS admin dashboard with charts and user management"
+            placeholder={t("textTab.placeholder")}
             className="w-full mb-4"
             value={text}
             onChange={(e) => setText(e.target.value)}
@@ -54,13 +56,13 @@ function GenerateFromText({ doCreateFromText }: GenerateFromTextProps) {
           />
           <div className="flex justify-between items-center">
             <span className="text-sm text-gray-500">
-              Press Cmd/Ctrl + Enter to generate
+              {t("textTab.pressCmdCtrlEnter")}
             </span>
             <div className="flex gap-2">
               <Button variant="outline" onClick={() => setIsOpen(false)}>
-                Cancel
+                {t("common.cancel")}
               </Button>
-              <Button onClick={handleGenerate}>Generate</Button>
+              <Button onClick={handleGenerate}>{t("textTab.generate")}</Button>
             </div>
           </div>
         </>

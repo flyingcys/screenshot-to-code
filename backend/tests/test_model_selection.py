@@ -99,6 +99,25 @@ class TestModelSelectionAllKeys:
         ]
         assert models == expected
 
+    @pytest.mark.asyncio
+    async def test_selected_model_overrides_automatic_variant_mix(self):
+        """Explicit model selection should pin all variants to the chosen model."""
+        models = await self.model_selector.select_models(
+            generation_type="create",
+            input_mode="text",
+            openai_api_key="key",
+            anthropic_api_key="key",
+            gemini_api_key="key",
+            selected_model=Llm.GPT_5_4_2026_03_05_LOW,
+        )
+
+        assert models == [
+            Llm.GPT_5_4_2026_03_05_LOW,
+            Llm.GPT_5_4_2026_03_05_LOW,
+            Llm.GPT_5_4_2026_03_05_LOW,
+            Llm.GPT_5_4_2026_03_05_LOW,
+        ]
+
 
 class TestModelSelectionOpenAIAnthropic:
     """Test model selection when only OpenAI and Anthropic keys are present."""
@@ -195,11 +214,45 @@ class TestModelSelectionNoKeys:
     @pytest.mark.asyncio
     async def test_no_keys_raises_error(self):
         """No keys: Should raise an exception"""
-        with pytest.raises(Exception, match="No API key"):
+        with pytest.raises(Exception, match="No OpenAI or Anthropic key"):
             await self.model_selector.select_models(
                 generation_type="create",
                 input_mode="text",
                 openai_api_key=None,
                 anthropic_api_key=None,
                 gemini_api_key=None,
+            )
+
+
+class TestModelSelectionExplicitModelValidation:
+    def setup_method(self):
+        mock_throw_error = AsyncMock()
+        self.model_selector = ModelSelectionStage(mock_throw_error)
+
+    @pytest.mark.asyncio
+    async def test_selected_model_requires_matching_provider_key(self):
+        with pytest.raises(
+            Exception, match="Selected model requires an OpenAI API key."
+        ):
+            await self.model_selector.select_models(
+                generation_type="create",
+                input_mode="text",
+                openai_api_key=None,
+                anthropic_api_key="key",
+                gemini_api_key="key",
+                selected_model=Llm.GPT_5_4_2026_03_05_LOW,
+            )
+
+    @pytest.mark.asyncio
+    async def test_video_mode_rejects_non_gemini_selected_model(self):
+        with pytest.raises(
+            Exception, match="Video mode only supports Gemini video models."
+        ):
+            await self.model_selector.select_models(
+                generation_type="create",
+                input_mode="video",
+                openai_api_key="key",
+                anthropic_api_key="key",
+                gemini_api_key="key",
+                selected_model=Llm.CLAUDE_OPUS_4_6,
             )

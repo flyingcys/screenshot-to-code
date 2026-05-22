@@ -55,7 +55,7 @@ describeE2E("qa e2e flows", () => {
     await installDomTestHooks(page);
     await setupRequestInterception(page, SCREENSHOT_WITH_IMAGES);
 
-    await page.goto("http://localhost:5173/", { waitUntil: "networkidle0" });
+    await page.goto("http://localhost:5174/", { waitUntil: "networkidle0" });
 
     // Set screen size
     await page.setViewport({ width: 1280, height: 1024 });

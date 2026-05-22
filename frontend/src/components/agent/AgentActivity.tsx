@@ -22,9 +22,37 @@ import { Light as SyntaxHighlighterBase } from "react-syntax-highlighter";
 import html from "react-syntax-highlighter/dist/esm/languages/hljs/xml";
 import { vs2015 } from "react-syntax-highlighter/dist/esm/styles/hljs";
 import WorkingPulse from "../core/WorkingPulse";
+import { useI18n } from "../../lib/i18n";
 
 SyntaxHighlighterBase.registerLanguage("html", html);
-const SyntaxHighlighter = SyntaxHighlighterBase as any;
+const SyntaxHighlighter = SyntaxHighlighterBase;
+
+type AgentImageItem = {
+  url?: string;
+  prompt?: string;
+  image_url?: string;
+  result_url?: string;
+};
+
+type AgentEditItem = {
+  old_text: string;
+  new_text: string;
+  replaced?: number;
+};
+
+type AgentToolRecord = {
+  count?: number;
+  image_urls?: string[];
+  prompts?: string[];
+  images?: AgentImageItem[];
+  edits?: AgentEditItem[];
+  error?: string;
+};
+
+function asToolRecord(value: unknown): AgentToolRecord | null {
+  if (typeof value !== "object" || value === null) return null;
+  return value as AgentToolRecord;
+}
 
 function CodePreviewBlock({ code, isGenerating }: { code: string; isGenerating: boolean }) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -110,52 +138,60 @@ function getEventIcon(type: AgentEventType, toolName?: string) {
   return <BsFileEarmarkPlus className="text-gray-500" />;
 }
 
-function getEventTitle(event: AgentEvent): string {
+function getEventTitle(event: AgentEvent, t: ReturnType<typeof useI18n>["t"]): string {
   if (event.type === "thinking") {
-    if (event.status === "running") return "Thinking";
+    if (event.status === "running") return t("agentActivity.thinking");
     const duration = formatDuration(event.startedAt, event.endedAt);
-    return duration ? `Thought for ${duration}` : "Thought";
+    return duration ? t("agentActivity.thoughtFor").replace("{duration}", duration) : t("agentActivity.thought");
   }
   if (event.type === "assistant") {
-    return "Assistant response";
+    return t("agentActivity.assistantResponse");
   }
   if (event.type === "tool") {
     if (event.toolName === "create_file") {
-      return event.status === "running" ? "Creating file" : "Created file";
+      return event.status === "running" ? t("agentActivity.creatingFile") : t("agentActivity.createdFile");
     }
     if (event.toolName === "edit_file") {
-      return event.status === "running" ? "Editing file" : "Edited file";
+      return event.status === "running" ? t("agentActivity.editingFile") : t("agentActivity.editedFile");
     }
     if (event.toolName === "generate_images") {
-      const input = event.input as any;
-      const output = event.output as any;
+      const input = asToolRecord(event.input);
+      const output = asToolRecord(event.output);
       const count = output?.images?.length || input?.count || 0;
       if (event.status === "running") {
-        return count ? `Generating ${count} image${count !== 1 ? "s" : ""}` : "Generating images";
+        return count
+          ? t("agentActivity.generatingNImages").replace("{count}", String(count))
+          : t("agentActivity.generatingImages");
       }
-      return count ? `Generated ${count} image${count !== 1 ? "s" : ""}` : "Generated images";
+      return count
+        ? t("agentActivity.generatedNImages").replace("{count}", String(count))
+        : t("agentActivity.generatedImages");
     }
     if (event.toolName === "remove_background") {
-      const rbInput = event.input as any;
-      const rbOutput = event.output as any;
+      const rbInput = asToolRecord(event.input);
+      const rbOutput = asToolRecord(event.output);
       const rbCount = rbOutput?.images?.length || rbInput?.image_urls?.length || 0;
       if (event.status === "running") {
-        return rbCount > 1 ? `Removing ${rbCount} backgrounds` : "Removing background";
+        return rbCount > 1
+          ? t("agentActivity.removingNBackgrounds").replace("{count}", String(rbCount))
+          : t("agentActivity.removingBackground");
       }
-      return rbCount > 1 ? `Removed ${rbCount} backgrounds` : "Background removed";
+      return rbCount > 1
+        ? t("agentActivity.removedNBackgrounds").replace("{count}", String(rbCount))
+        : t("agentActivity.backgroundRemoved");
     }
     if (event.toolName === "retrieve_option") {
       return event.status === "running"
-        ? "Retrieving option"
-        : "Retrieved option";
+        ? t("agentActivity.retrievingOption")
+        : t("agentActivity.retrievedOption");
     }
-    return event.status === "running" ? "Running tool" : "Tool completed";
+    return event.status === "running" ? t("agentActivity.runningTool") : t("agentActivity.toolCompleted");
   }
-  return "Activity";
+  return t("agentActivity.activity");
 }
 
 
-function renderToolDetails(event: AgentEvent, variantCode?: string) {
+function renderToolDetails(event: AgentEvent, t: ReturnType<typeof useI18n>["t"], variantCode?: string) {
   if (!event.input && !event.output) return null;
 
   const renderJson = (data: unknown) => {
@@ -176,27 +212,23 @@ function renderToolDetails(event: AgentEvent, variantCode?: string) {
     );
   };
 
-  const output = event.output as any;
-  const input = event.input as any;
+  const output = asToolRecord(event.output);
+  const input = asToolRecord(event.input);
   const hasError = Boolean(output?.error);
-  const images =
-    output && Array.isArray(output.images) ? (output.images as Array<any>) : null;
-  const edits =
-    output && Array.isArray(output.edits) ? (output.edits as Array<any>) : null;
+  const images = output?.images ?? null;
+  const edits = output?.edits ?? null;
 
   return (
     <div className="text-sm text-gray-700 dark:text-gray-200">
       {hasError && (
         <div className="rounded-md border border-red-200 dark:border-red-700 bg-red-50 dark:bg-red-900/30 p-3">
-          <div className="text-xs uppercase tracking-wide text-red-500">Error</div>
+          <div className="text-xs uppercase tracking-wide text-red-500">{t("agentActivity.error")}</div>
           <div className="mt-1 text-sm text-red-700 dark:text-red-200">
             {output?.error}
           </div>
-          {event.input && (
+          {Boolean(event.input) && (
             <div className="mt-2">
-              <div className="text-xs uppercase tracking-wide text-red-400">
-                Input
-              </div>
+              <div className="text-xs uppercase tracking-wide text-red-400">{t("agentActivity.input")}</div>
               {renderJson(event.input)}
             </div>
           )}
@@ -214,17 +246,17 @@ function renderToolDetails(event: AgentEvent, variantCode?: string) {
               className="rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900/60 p-3"
             >
               <div className="text-xs uppercase tracking-wide text-gray-400">
-                Edit {index + 1}
+                {t("agentActivity.edit").replace("{index}", String(index + 1))}
               </div>
               <div className="mt-2 grid gap-2">
                 <div>
-                  <div className="text-xs text-gray-500">Old</div>
+                  <div className="text-xs text-gray-500">{t("agentActivity.old")}</div>
                   <div className="mt-1 rounded bg-red-50 dark:bg-red-900/30 p-2 text-xs font-mono text-red-700 dark:text-red-200 break-all">
                     {edit.old_text}
                   </div>
                 </div>
                 <div>
-                  <div className="text-xs text-gray-500">New</div>
+                  <div className="text-xs text-gray-500">{t("agentActivity.new")}</div>
                   <div className="mt-1 rounded bg-emerald-50 dark:bg-emerald-900/30 p-2 text-xs font-mono text-emerald-700 dark:text-emerald-200 break-all">
                     {edit.new_text}
                   </div>
@@ -232,7 +264,7 @@ function renderToolDetails(event: AgentEvent, variantCode?: string) {
               </div>
               {edit.replaced !== undefined && (
                 <div className="mt-2 text-xs text-gray-500">
-                  Replaced {edit.replaced} time{edit.replaced === 1 ? "" : "s"}
+                  {t("agentActivity.replaced").replace("{count}", String(edit.replaced))}
                 </div>
               )}
             </div>
@@ -261,13 +293,13 @@ function renderToolDetails(event: AgentEvent, variantCode?: string) {
                     {item.url ? (
                       <img
                         src={item.url}
-                        alt={item.prompt || `Generated image ${index + 1}`}
+                        alt={item.prompt || t("agentActivity.generatedNImages").replace("{count}", String(index + 1))}
                         className="w-full rounded object-cover"
                         loading="lazy"
                       />
                     ) : (
                       <div className="aspect-square rounded bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-xs text-gray-400">
-                        Failed
+                        {t("agentActivity.failed")}
                       </div>
                     )}
                   </div>
@@ -290,7 +322,7 @@ function renderToolDetails(event: AgentEvent, variantCode?: string) {
                 <div key={index} className="py-2">
                   <img
                     src={url}
-                    alt={`Original image ${index + 1}`}
+                    alt={t("agentActivity.originalImage").replace("{index}", String(index + 1))}
                     className="w-full rounded object-cover"
                     loading="lazy"
                   />
@@ -301,19 +333,19 @@ function renderToolDetails(event: AgentEvent, variantCode?: string) {
           {/* After complete: before/after side by side for each image */}
           {event.status !== "running" && output?.images && Array.isArray(output.images) && (
             <div className="divide-y divide-gray-100 dark:divide-gray-800">
-              {output.images.map((item: any, index: number) => (
+              {output.images.map((item, index: number) => (
                 <div key={`${item.image_url}-${index}`} className="flex gap-2 py-2">
                   <div className="w-1/2">
-                    <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">Before</div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t("agentActivity.before")}</div>
                     <img
                       src={item.image_url}
-                      alt={`Original image ${index + 1}`}
+                      alt={t("agentActivity.originalImage").replace("{index}", String(index + 1))}
                       className="w-full rounded object-cover"
                       loading="lazy"
                     />
                   </div>
                   <div className="w-1/2">
-                    <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">After</div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t("agentActivity.after")}</div>
                     {item.result_url ? (
                       <div className="relative">
                         <div
@@ -327,14 +359,14 @@ function renderToolDetails(event: AgentEvent, variantCode?: string) {
                         />
                         <img
                           src={item.result_url}
-                          alt="Background removed"
+                          alt={t("agentActivity.backgroundRemoved")}
                           className="relative w-full rounded"
                           loading="lazy"
                         />
                       </div>
                     ) : (
                       <div className="aspect-square rounded bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-xs text-gray-400">
-                        Failed
+                        {t("agentActivity.failed")}
                       </div>
                     )}
                   </div>
@@ -349,17 +381,13 @@ function renderToolDetails(event: AgentEvent, variantCode?: string) {
         <>
           {event.input && (
             <div>
-              <div className="text-xs uppercase tracking-wide text-gray-400">
-                Input
-              </div>
+              <div className="text-xs uppercase tracking-wide text-gray-400">{t("agentActivity.input")}</div>
               {renderJson(event.input)}
             </div>
           )}
           {event.output && (
             <div className="mt-3">
-              <div className="text-xs uppercase tracking-wide text-gray-400">
-                Output
-              </div>
+              <div className="text-xs uppercase tracking-wide text-gray-400">{t("agentActivity.output")}</div>
               {renderJson(event.output)}
             </div>
           )}
@@ -379,6 +407,7 @@ function AgentEventCard({
   variantCode?: string;
 }) {
   const [expanded, setExpanded] = useState(Boolean(autoExpand));
+  const { t } = useI18n();
 
   useEffect(() => {
     if (autoExpand) {
@@ -420,7 +449,7 @@ function AgentEventCard({
       >
         {getEventIcon(event.type, event.toolName)}
         <span className={`text-sm flex-1 ${event.status === "running" ? "active-step-shimmer" : ""}`}>
-          {getEventTitle(event)}
+          {getEventTitle(event, t)}
         </span>
         {isExpanded ? (
           <BsChevronDown className="text-xs shrink-0" />
@@ -449,7 +478,7 @@ function AgentEventCard({
               </ReactMarkdown>
             </div>
           )}
-          {event.type === "tool" && renderToolDetails(event, variantCode)}
+          {event.type === "tool" && renderToolDetails(event, t, variantCode)}
         </div>
       )}
     </div>
@@ -463,6 +492,7 @@ function AgentActivity() {
   >({});
   const [nowMs, setNowMs] = useState(() => Date.now());
   const appState = useAppStore((s) => s.appState);
+  const { t } = useI18n();
 
   useEffect(() => {
     if (appState !== AppState.CODING) return;
@@ -554,10 +584,10 @@ function AgentActivity() {
           <div className="flex items-center justify-between rounded-xl border border-violet-200 dark:border-violet-800 bg-gradient-to-r from-violet-50 to-white dark:from-violet-900/20 dark:to-zinc-900 px-3 py-2 shadow-[0_0_15px_-3px_rgba(139,92,246,0.3)] dark:shadow-[0_0_15px_-3px_rgba(139,92,246,0.4)] transition-all duration-500">
             <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
               <WorkingPulse />
-              <span>Working...</span>
+              <span>{t("common.working")}</span>
             </div>
             <div className="text-xs font-semibold text-gray-700 dark:text-gray-200">
-              Time so far {runningDuration || "--"}
+              {t("sidebar.timeSoFar")} {runningDuration || "--"}
             </div>
           </div>
           {events.map((event) => (

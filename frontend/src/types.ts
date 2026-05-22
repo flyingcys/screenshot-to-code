@@ -1,5 +1,5 @@
 import { Stack } from "./lib/stacks";
-import { CodeGenerationModel } from "./lib/models";
+import { AUTO_CODE_GENERATION_MODEL, CodeGenerationModel } from "./lib/models";
 
 export enum EditorTheme {
   ESPRESSO = "espresso",
@@ -12,6 +12,11 @@ export enum AppTheme {
   DARK = "dark",
 }
 
+export type Locale = "auto" | "zh" | "en";
+export type CodeGenerationModelSetting =
+  | CodeGenerationModel
+  | typeof AUTO_CODE_GENERATION_MODEL;
+
 export interface Settings {
   openAiApiKey: string | null;
   openAiBaseURL: string | null;
@@ -19,11 +24,12 @@ export interface Settings {
   isImageGenerationEnabled: boolean;
   editorTheme: EditorTheme;
   generatedCodeConfig: Stack;
-  codeGenerationModel: CodeGenerationModel;
+  codeGenerationModel: CodeGenerationModelSetting;
   // Only relevant for hosted version
   isTermOfServiceAccepted: boolean;
   anthropicApiKey: string | null;
   geminiApiKey: string | null;
+  locale: Locale;
 }
 
 export enum AppState {

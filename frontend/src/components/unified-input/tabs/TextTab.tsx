@@ -4,6 +4,7 @@ import { Textarea } from "../../ui/textarea";
 import toast from "react-hot-toast";
 import OutputSettingsSection from "../../settings/OutputSettingsSection";
 import { Stack } from "../../../lib/stacks";
+import { useI18n } from "../../../lib/i18n";
 
 interface Props {
   doCreateFromText: (text: string) => void;
@@ -12,15 +13,16 @@ interface Props {
 }
 
 const EXAMPLE_PROMPTS = [
-  "An ecommerce homepage for eco-friendly skincare with product grid, reviews, and newsletter signup",
-  "A portfolio site for a product designer with case studies, process steps, and contact",
-  "A mobile fitness app dashboard with workout plan, progress ring, and quick-start buttons",
-  "A music streaming app with now-playing, recommended playlists, and recent listens",
+  "一个环保护肤电商首页，包含商品网格、评价和订阅表单",
+  "一个产品设计师作品集网站，包含案例研究、流程步骤和联系方式",
+  "一个移动健身应用仪表盘，包含训练计划、进度环和快速开始按钮",
+  "一个音乐流媒体应用，包含正在播放、推荐歌单和最近播放记录",
 ];
 
 function TextTab({ doCreateFromText, stack, setStack }: Props) {
   const [text, setText] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const { t } = useI18n();
 
   useEffect(() => {
     textareaRef.current?.focus();
@@ -28,7 +30,7 @@ function TextTab({ doCreateFromText, stack, setStack }: Props) {
 
   const handleGenerate = () => {
     if (text.trim() === "") {
-      toast.error("Please enter a description");
+      toast.error(t("textTab.enterDescription"));
       return;
     }
     doCreateFromText(text);
@@ -71,7 +73,9 @@ function TextTab({ doCreateFromText, stack, setStack }: Props) {
             </div>
 
             <div className="text-center">
-              <h3 className="text-gray-700 dark:text-zinc-200 font-medium">Generate from Text</h3>
+              <h3 className="text-gray-700 dark:text-zinc-200 font-medium">
+                {t("textTab.generateFromText")}
+              </h3>
             </div>
           </div>
 
@@ -79,7 +83,7 @@ function TextTab({ doCreateFromText, stack, setStack }: Props) {
             <Textarea
               ref={textareaRef}
               rows={4}
-              placeholder="Describe the UI you want to create..."
+              placeholder={t("textTab.placeholder")}
               className="w-full resize-none"
               value={text}
               onChange={(e) => setText(e.target.value)}
@@ -88,7 +92,7 @@ function TextTab({ doCreateFromText, stack, setStack }: Props) {
             />
 
             <div className="flex flex-col gap-2">
-              <p className="text-xs text-gray-500 dark:text-zinc-400">Try an example:</p>
+              <p className="text-xs text-gray-500 dark:text-zinc-400">{t("textTab.tryExample")}</p>
               <div className="flex flex-wrap gap-2">
                 {EXAMPLE_PROMPTS.map((example, index) => (
                   <button
@@ -114,11 +118,11 @@ function TextTab({ doCreateFromText, stack, setStack }: Props) {
               size="lg"
               data-testid="text-generate"
             >
-              Generate
+              {t("textTab.generate")}
             </Button>
 
             <p className="text-xs text-gray-400 dark:text-zinc-500 text-center">
-              Press Cmd/Ctrl + Enter to generate
+              {t("textTab.pressCmdCtrlEnter")}
             </p>
           </div>
         </div>

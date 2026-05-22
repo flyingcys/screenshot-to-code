@@ -2,6 +2,7 @@ import { renderHistory, RenderedHistoryItem } from "./utils";
 import { useProjectStore } from "../../store/project-store";
 import { BsChevronDown, BsChevronRight } from "react-icons/bs";
 import { useState, useRef, useEffect, useCallback } from "react";
+import { useI18n } from "../../lib/i18n";
 
 function MediaThumbnail({
   item,
@@ -10,6 +11,7 @@ function MediaThumbnail({
   item: RenderedHistoryItem;
   onPlayClick?: () => void;
 }) {
+  const { t } = useI18n();
   const firstImage = item.images[0];
   const firstVideo = item.videos[0];
 
@@ -18,9 +20,9 @@ function MediaThumbnail({
   return (
     <div className="shrink-0 w-12 h-12 rounded-md overflow-hidden border border-gray-200 dark:border-zinc-700 bg-gray-100 dark:bg-zinc-800">
       {firstImage ? (
-        <img
+      <img
           src={firstImage}
-          alt="Input screenshot"
+          alt={t("history.inputScreenshot")}
           className="w-full h-full object-cover"
           draggable={false}
         />
@@ -61,6 +63,7 @@ function ExpandedMedia({
   item: RenderedHistoryItem;
   autoPlayVideo?: boolean;
 }) {
+  const { t } = useI18n();
   const hasImages = item.images.length > 0;
   const hasVideos = item.videos.length > 0;
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -82,7 +85,7 @@ function ExpandedMedia({
         >
           <img
             src={img}
-            alt={`Input ${i + 1}`}
+            alt={`${t("history.inputScreenshot")} ${i + 1}`}
             className="w-full h-auto object-contain max-h-48"
             draggable={false}
           />
@@ -109,6 +112,7 @@ function ExpandedMedia({
 
 export default function HistoryDisplay() {
   const { commits, head, setHead } = useProjectStore();
+  const { locale, t } = useI18n();
   const [expandedHash, setExpandedHash] = useState<string | null>(null);
   const [autoPlayHash, setAutoPlayHash] = useState<string | null>(null);
 
@@ -131,7 +135,7 @@ export default function HistoryDisplay() {
   );
 
   // Annotate history items with a summary, parent version, etc.
-  const renderedHistory = renderHistory(flatHistory);
+  const renderedHistory = renderHistory(flatHistory, locale);
 
   if (renderedHistory.length === 0) return null;
 
@@ -189,7 +193,8 @@ export default function HistoryDisplay() {
                   </span>
                   {item.parentVersion !== null && (
                     <span className="text-[10px] text-gray-400 dark:text-gray-500">
-                      from v{item.parentVersion}
+                      {t("history.fromVersion")}
+                      {item.parentVersion}
                     </span>
                   )}
                 </div>
@@ -240,7 +245,7 @@ export default function HistoryDisplay() {
                 )}
                 {item.selectedElementTag && (
                   <p className="text-xs text-violet-500 dark:text-violet-400 mt-1">
-                    Target: <code className="font-mono text-[10px] bg-violet-100 dark:bg-violet-900/30 px-1 py-0.5 rounded">&lt;{item.selectedElementTag}&gt;</code>
+                    {t("history.target")} <code className="font-mono text-[10px] bg-violet-100 dark:bg-violet-900/30 px-1 py-0.5 rounded">&lt;{item.selectedElementTag}&gt;</code>
                   </p>
                 )}
                 <ExpandedMedia

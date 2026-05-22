@@ -3,6 +3,7 @@ import classNames from "classnames";
 import useThrottle from "../../hooks/useThrottle";
 import { useAppStore } from "../../store/app-store";
 import { addHighlight, removeHighlight } from "../select-and-edit/utils";
+import { useI18n } from "../../lib/i18n";
 
 interface Props {
   code: string;
@@ -22,6 +23,7 @@ function PreviewComponent({
 }: Props) {
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
   const wrapperRef = useRef<HTMLDivElement | null>(null);
+  const { t } = useI18n();
 
   // Don't update code more often than every 200ms.
   const throttledCode = useThrottle(code, 200);
@@ -175,7 +177,7 @@ function PreviewComponent({
         <iframe
           id={`preview-${device}`}
           ref={iframeRef}
-          title="Preview"
+          title={t("common.preview")}
           className={classNames(
             {
               "border-0": true,

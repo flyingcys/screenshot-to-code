@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useProjectStore } from "../../store/project-store";
 import { BsChevronDown, BsChevronRight } from "react-icons/bs";
 import ReactMarkdown from "react-markdown";
+import { useI18n } from "../../lib/i18n";
 
 function getLastSentence(text: string): string {
   const sentences = text.split(/(?<=[.!?])\s+/);
@@ -19,6 +20,7 @@ function getLastSentence(text: string): string {
 
 function ThinkingIndicator() {
   const [isExpanded, setIsExpanded] = useState(false);
+  const { t } = useI18n();
 
   const { head, commits, latestCommitHash } = useProjectStore();
 
@@ -55,11 +57,11 @@ function ThinkingIndicator() {
   }
 
   // Determine header text
-  let headerText = "AI Thinking";
+  let headerText = t("thinking.header");
   if (isWaiting) {
-    headerText = "AI is thinking...";
+    headerText = t("thinking.waiting");
   } else if (isThinkingComplete && thinkingDuration !== undefined) {
-    headerText = `AI thought for ${thinkingDuration}s`;
+    headerText = t("thinking.completed").replace("{seconds}", String(thinkingDuration));
   }
 
   const previewText = thinking ? getLastSentence(thinking) : "";
@@ -126,7 +128,7 @@ function ThinkingIndicator() {
             <span className="flex items-center gap-1">
               <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
               <span className="text-xs text-green-600 dark:text-green-400">
-                {isWaiting ? "starting" : "reasoning"}
+                {isWaiting ? t("thinking.starting") : t("thinking.reasoning")}
               </span>
             </span>
           )}

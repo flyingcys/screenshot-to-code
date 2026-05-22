@@ -4,6 +4,7 @@ import { toast } from "react-hot-toast";
 import ScreenRecorder from "./recording/ScreenRecorder";
 import { ScreenRecorderState } from "../types";
 import { Stack } from "../lib/stacks";
+import { useI18n } from "../lib/i18n";
 
 const baseStyle = {
   flex: 1,
@@ -85,6 +86,7 @@ function ImageUpload({ setReferenceImages, onUploadStateChange, stack, setStack 
   const [textPrompt, setTextPrompt] = useState("");
   const [showTextPrompt, setShowTextPrompt] = useState(false);
   const textInputRef = useRef<HTMLTextAreaElement>(null);
+  const { t } = useI18n();
 
   // TODO: Switch to Zustand
   const [screenRecorderState, setScreenRecorderState] =
@@ -178,8 +180,8 @@ function ImageUpload({ setReferenceImages, onUploadStateChange, stack, setStack 
             }
           })
           .catch((error) => {
-            toast.error("Error reading files" + error);
-            console.error("Error reading files:", error);
+            toast.error(t("uploadTab.errorReadingFiles"));
+            console.error(t("uploadTab.errorReadingFiles"), error);
           });
       },
       onDropRejected: (rejectedFiles) => {
@@ -216,8 +218,7 @@ function ImageUpload({ setReferenceImages, onUploadStateChange, stack, setStack 
         <div {...getRootProps({ style: style as any })}>
           <input {...getInputProps()} className="file-input" />
           <p className="text-slate-700 text-lg">
-            Drag & drop a screenshot here, <br />
-            or click to upload
+            {t("imageUpload.dragDropScreenshot")}
           </p>
         </div>
       )}
@@ -235,14 +236,14 @@ function ImageUpload({ setReferenceImages, onUploadStateChange, stack, setStack 
             ) : (
               <img
                 src={files[0]?.preview}
-                alt="Uploaded screenshot"
+                alt={t("imageUpload.removeImage")}
                 className="w-full h-auto max-h-[500px] object-contain rounded-lg"
               />
             )}
             <button
               onClick={handleClear}
               className="absolute top-2 right-2 bg-white rounded-full p-1 shadow-md hover:bg-gray-100"
-              aria-label="Remove image"
+              aria-label={t("imageUpload.removeImage")}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -268,7 +269,7 @@ function ImageUpload({ setReferenceImages, onUploadStateChange, stack, setStack 
               }}
               className="text-sm text-gray-500 hover:text-gray-700 underline"
             >
-              (optional) add text prompt
+              {t("imageUpload.addTextPrompt")}
             </button>
           ) : (
             <div className="w-full max-w-lg">
@@ -277,7 +278,7 @@ function ImageUpload({ setReferenceImages, onUploadStateChange, stack, setStack 
                 value={textPrompt}
                 onChange={(e) => setTextPrompt(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="Describe any specific requirements or changes..."
+                placeholder={t("imageUpload.describeRequirements")}
                 className="w-full p-3 text-sm border border-gray-300 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent"
                 rows={3}
               />
@@ -290,10 +291,10 @@ function ImageUpload({ setReferenceImages, onUploadStateChange, stack, setStack 
               onClick={handleGenerate}
               className="w-full py-3 px-6 bg-black text-white font-medium rounded-md hover:bg-gray-800 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
             >
-              Generate
+              {t("imageUpload.generate")}
             </button>
             <p className="text-xs text-gray-400">
-              Press Enter to generate
+              {t("imageUpload.pressEnterToGenerate")}
             </p>
           </div>
         </div>
@@ -301,10 +302,9 @@ function ImageUpload({ setReferenceImages, onUploadStateChange, stack, setStack 
 
       {screenRecorderState === ScreenRecorderState.INITIAL && !hasUploadedFile && (
         <div className="text-center text-sm text-slate-800 mt-4">
-          Upload a screen recording (.mp4, .mov) or record your screen to clone
-          a whole app.{" "}
+          {t("imageUpload.uploadRecording")}{" "}
           <span className="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700">
-            Beta
+            {t("imageUpload.beta")}
           </span>
         </div>
       )}

@@ -78,7 +78,7 @@ yarn
 yarn dev
 ```
 
-Open http://localhost:5173 to use the app.
+Open http://localhost:5174 to use the app.
 
 If you prefer to run the backend on a different port, update VITE_WS_BACKEND_URL in `frontend/.env.local`
 
@@ -91,7 +91,7 @@ echo "OPENAI_API_KEY=sk-your-key" > .env
 docker-compose up -d --build
 ```
 
-The app will be up and running at http://localhost:5173. Note that you can't develop the application with this setup as the file changes won't trigger a rebuild.
+The app will be up and running at http://localhost:5174. Note that you can't develop the application with this setup as the file changes won't trigger a rebuild.
 
 ## 🙋‍♂️ FAQs
 

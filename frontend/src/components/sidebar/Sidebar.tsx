@@ -5,6 +5,7 @@ import { Button } from "../ui/button";
 import { useEffect, useRef, useState, useCallback } from "react";
 import { LuMousePointerClick, LuRefreshCw, LuArrowUp, LuX } from "react-icons/lu";
 import { toast } from "react-hot-toast";
+import { useI18n } from "../../lib/i18n";
 
 import Variants from "../variants/Variants";
 import UpdateImageUpload, { UpdateImagePreview } from "../UpdateImageUpload";
@@ -30,24 +31,30 @@ function extractTagName(html: string): string {
   return match ? match[1].toLowerCase() : "element";
 }
 
-function summarizeLatestChange(commit: Commit | null): string | null {
+function summarizeLatestChange(
+  commit: Commit | null,
+  t: ReturnType<typeof useI18n>["t"],
+  formatMessage: (key: Parameters<ReturnType<typeof useI18n>["t"]>[0], replacements: Record<string, string | number>) => string
+): string | null {
   if (!commit) return null;
-  if (commit.type === "code_create") return "Imported existing code.";
+  if (commit.type === "code_create") return t("sidebar.importedExistingCode");
 
   const text = commit.inputs.text.trim();
   if (text.length > 0) return text;
 
   if (commit.type === "ai_create") {
-    return "Create";
+    return t("history.create");
   }
 
   if (commit.inputs.images.length > 1) {
-    return `Updated with ${commit.inputs.images.length} reference images.`;
+    return formatMessage("sidebar.updatedWithReferenceImages", {
+      count: commit.inputs.images.length,
+    });
   }
   if (commit.inputs.images.length === 1) {
-    return "Updated with one reference image.";
+    return t("sidebar.updatedWithOneReferenceImage");
   }
-  return "Updated code.";
+  return t("sidebar.updatedCode");
 }
 
 function getSelectedElementTag(commit: Commit | null): string | null {
@@ -71,6 +78,7 @@ function Sidebar({
   cancelCodeGeneration,
   onOpenVersions,
 }: SidebarProps) {
+  const { t } = useI18n();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const middlePaneRef = useRef<HTMLDivElement>(null);
   const [isErrorExpanded, setIsErrorExpanded] = useState(false);
@@ -80,6 +88,18 @@ function Sidebar({
   const [isDragging, setIsDragging] = useState(false);
   const [nowMs, setNowMs] = useState(() => Date.now());
   const [lightboxImage, setLightboxImage] = useState<string | null>(null);
+  const formatMessage = useCallback(
+    (
+      key: Parameters<typeof t>[0],
+      replacements: Record<string, string | number>
+    ) =>
+      Object.entries(replacements).reduce(
+        (message, [placeholder, value]) =>
+          message.split(`{${placeholder}}`).join(String(value)),
+        t(key)
+      ),
+    [t]
+  );
 
   const {
     appState,
@@ -117,7 +137,9 @@ function Sidebar({
       try {
         if (updateImages.length >= MAX_UPDATE_IMAGES) {
           toast.error(
-            `You’ve reached the limit of ${MAX_UPDATE_IMAGES} reference images. Remove one to add another.`
+            formatMessage("updateImages.limitReached", {
+              max: MAX_UPDATE_IMAGES,
+            })
           );
           return;
         }
@@ -126,9 +148,10 @@ function Sidebar({
         let filesToAdd = files;
         if (filesToAdd.length > remainingSlots) {
           toast.error(
-            `Only ${remainingSlots} more image${
-              remainingSlots === 1 ? "" : "s"
-            } will be added to stay within the ${MAX_UPDATE_IMAGES}-image limit.`
+            formatMessage("updateImages.onlyMoreWillBeAdded", {
+              remaining: remainingSlots,
+              max: MAX_UPDATE_IMAGES,
+            })
           );
           filesToAdd = filesToAdd.slice(0, remainingSlots);
         }
@@ -136,17 +159,17 @@ function Sidebar({
         const newImagePromises = filesToAdd.map((file) => fileToDataURL(file));
         const newImages = await Promise.all(newImagePromises);
         setUpdateImages([...updateImages, ...newImages]);
-      } catch (error) {
-        console.error("Error reading files:", error);
+    } catch (error) {
+        console.error(t("updateImages.errorReading"), error);
       }
     },
-    [updateImages, setUpdateImages]
+    [updateImages, setUpdateImages, formatMessage, t]
   );
 
   const { head, commits, latestCommitHash, setHead } = useProjectStore();
 
   const currentCommit = head ? commits[head] : null;
-  const latestChangeSummary = summarizeLatestChange(currentCommit);
+  const latestChangeSummary = summarizeLatestChange(currentCommit, t, formatMessage);
   const selectedElementTag = getSelectedElementTag(currentCommit);
   const latestChangeImages =
     currentCommit && currentCommit.type !== "code_create"
@@ -198,6 +221,7 @@ function Sidebar({
     commits[head] &&
     commits[head].variants[commits[head].selectedVariantIndex].status ===
       "error";
+  const selectedVariantIndexForHead = head ? commits[head]?.selectedVariantIndex : undefined;
 
   // Get the error message from the selected variant
   const selectedVariantErrorMessage =
@@ -241,7 +265,7 @@ function Sidebar({
   // Reset error expanded state when variant changes
   useEffect(() => {
     setIsErrorExpanded(false);
-  }, [head, commits[head || ""]?.selectedVariantIndex]);
+  }, [head, selectedVariantIndexForHead]);
 
   // Reset prompt expanded state when commit changes and detect clamping
   useEffect(() => {
@@ -298,7 +322,8 @@ function Sidebar({
                 <div className="mt-1.5 flex items-center gap-1.5">
                   <LuMousePointerClick className="w-3 h-3 text-violet-500 dark:text-violet-400" />
                   <span className="text-[11px] text-violet-600 dark:text-violet-300">
-                    Selected: <code className="font-mono text-[10px] bg-violet-200/60 dark:bg-violet-800/50 px-1 py-0.5 rounded">&lt;{selectedElementTag}&gt;</code>
+                    {t("sidebar.selectedPrefix")}{" "}
+                    <code className="font-mono text-[10px] bg-violet-200/60 dark:bg-violet-800/50 px-1 py-0.5 rounded">&lt;{selectedElementTag}&gt;</code>
                   </span>
                 </div>
               )}
@@ -308,7 +333,7 @@ function Sidebar({
                     onClick={() => setIsPromptExpanded(!isPromptExpanded)}
                     className="text-[11px] font-medium text-gray-600 bg-white/70 hover:bg-white dark:text-gray-300 dark:bg-zinc-800/70 dark:hover:bg-zinc-800 px-2 py-0.5 rounded-full transition-colors shadow-sm"
                   >
-                    {isPromptExpanded ? "less" : "more"}
+                    {isPromptExpanded ? t("common.less") : t("common.more")}
                   </button>
                 </div>
               )}
@@ -323,7 +348,9 @@ function Sidebar({
                     >
                       <img
                         src={image}
-                        alt={`Reference ${index + 1}`}
+                        alt={formatMessage("sidebar.referenceImageAlt", {
+                          index: index + 1,
+                        })}
                         className="h-24 w-24 object-contain"
                         loading="lazy"
                       />
@@ -352,10 +379,10 @@ function Sidebar({
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
                 <WorkingPulse />
-                <span>Working...</span>
+                <span>{t("common.working")}</span>
               </div>
               <div className="text-xs font-semibold text-gray-700 dark:text-gray-200">
-                Time so far {elapsedSeconds ? `${elapsedSeconds}s` : "--"}
+                {t("sidebar.timeSoFar")} {elapsedSeconds ? `${elapsedSeconds}s` : "--"}
               </div>
             </div>
           </div>
@@ -367,31 +394,33 @@ function Sidebar({
           !isSelectedVariantComplete &&
           !isSelectedVariantError &&
           isSlowGeminiModel(selectedVariant?.model) && (
-          <div className="mb-3 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-900 dark:border-amber-800 dark:bg-amber-900/20 dark:text-amber-200">
-            Slow, high quality model. May take 5-10 mins on some images/videos.
-          </div>
+            <div className="mb-3 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-900 dark:border-amber-800 dark:bg-amber-900/20 dark:text-amber-200">
+              {t("sidebar.slowHighQualityModel")}
+            </div>
         )}
 
         {isViewingOlderVersion && currentVersionNumber !== null ? (
           <div className="mb-4 flex flex-col items-center py-6">
             <p className="text-2xl font-semibold text-gray-900 dark:text-zinc-100">
-              Version {currentVersionNumber}
+              {formatMessage("app.currentVersionLabel", {
+                version: currentVersionNumber,
+              })}
             </p>
             <p className="mt-1 text-sm text-gray-400 dark:text-gray-500">
-              You are viewing an older version
+              {t("sidebar.viewingOlderVersion")}
             </p>
             <div className="mt-4 flex gap-2">
               <button
                 onClick={onOpenVersions}
                 className="rounded-lg border border-gray-300 dark:border-zinc-600 px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-700 transition-colors"
               >
-                All versions
+                {t("common.allVersions")}
               </button>
               <button
                 onClick={() => latestCommitHash && setHead(latestCommitHash)}
                 className="rounded-lg bg-gray-900 dark:bg-white px-4 py-2 text-sm font-medium text-white dark:text-black hover:bg-black dark:hover:bg-gray-200 transition-colors"
               >
-                View latest
+                {t("common.viewLatest")}
               </button>
             </div>
           </div>
@@ -417,7 +446,7 @@ function Sidebar({
               className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors"
             >
               <LuRefreshCw className="w-3.5 h-3.5" />
-              Retry
+              {t("common.retry")}
             </button>
           </div>
         )}
@@ -429,7 +458,7 @@ function Sidebar({
               onClick={cancelCodeGeneration}
               className="w-full dark:text-white dark:bg-gray-700"
             >
-              Cancel All Generations
+              {t("common.cancelAllGenerations")}
             </Button>
           </div>
         )}
@@ -439,7 +468,7 @@ function Sidebar({
           <div className="bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-md p-3 mb-2">
             <div className="text-red-800 dark:text-red-200 text-sm">
               <div className="font-medium mb-1">
-                This option failed to generate because
+                {t("sidebar.failedToGenerateBecause")}
               </div>
               {selectedVariantErrorMessage && (
                 <div className="mb-2">
@@ -453,15 +482,15 @@ function Sidebar({
                       onClick={() => setIsErrorExpanded(!isErrorExpanded)}
                       className="text-red-600 dark:text-red-400 text-xs underline mt-1 hover:text-red-800 dark:hover:text-red-300"
                     >
-                      {isErrorExpanded ? "Show less" : "Show more"}
+                      {isErrorExpanded ? t("common.showLess") : t("common.showMore")}
                     </button>
                   )}
                 </div>
               )}
               <div>
                 {isFirstGeneration
-                  ? "Click Retry to run the create request again."
-                  : "Switch to another option above to make updates."}
+                  ? t("sidebar.clickRetryToRunCreateAgain")
+                  : t("sidebar.switchToAnotherOptionAbove")}
               </div>
             </div>
           </div>
@@ -490,7 +519,8 @@ function Sidebar({
                     <div className="flex items-center gap-2 min-w-0">
                       <LuMousePointerClick className="w-3.5 h-3.5 text-violet-600 dark:text-violet-400 shrink-0" />
                       <span className="text-sm text-violet-700 dark:text-violet-300 truncate">
-                        Selected: <code className="font-mono text-xs bg-violet-100 dark:bg-violet-800/50 px-1.5 py-0.5 rounded">&lt;{selectedElement.tagName.toLowerCase()}&gt;</code>
+                        {t("sidebar.selectedPrefix")}{" "}
+                        <code className="font-mono text-xs bg-violet-100 dark:bg-violet-800/50 px-1.5 py-0.5 rounded">&lt;{selectedElement.tagName.toLowerCase()}&gt;</code>
                       </span>
                     </div>
                     <button
@@ -499,7 +529,7 @@ function Sidebar({
                         setSelectedElement(null);
                       }}
                       className="shrink-0 ml-3 p-0.5 text-violet-400 hover:text-violet-700 dark:hover:text-violet-200 transition-colors"
-                      title="Clear selection"
+                      title={t("sidebar.clearSelection")}
                     >
                       <LuX className="w-3.5 h-3.5" />
                     </button>
@@ -508,13 +538,15 @@ function Sidebar({
                   <div className="flex items-center justify-between rounded-xl border border-violet-200 dark:border-violet-700 bg-violet-50 dark:bg-violet-900/20 px-3 py-2">
                     <div className="flex items-center gap-2">
                       <LuMousePointerClick className="w-3.5 h-3.5 text-violet-500 dark:text-violet-400 shrink-0" />
-                      <span className="text-sm font-medium text-violet-700 dark:text-violet-300">Click an element to edit it</span>
+                      <span className="text-sm font-medium text-violet-700 dark:text-violet-300">
+                        {t("sidebar.clickElementToEditIt")}
+                      </span>
                     </div>
                     <button
                       onClick={toggleInSelectAndEditMode}
                       className="shrink-0 ml-3 text-sm text-violet-500 dark:text-violet-400 hover:text-violet-800 dark:hover:text-violet-200 transition-colors"
                     >
-                      Exit
+                      {t("sidebar.exitSelectionMode")}
                     </button>
                   </div>
                 )}
@@ -529,8 +561,10 @@ function Sidebar({
                 ref={textareaRef}
                 placeholder={
                   inSelectAndEditMode && selectedElement
-                    ? `Describe changes for the selected <${selectedElement.tagName.toLowerCase()}> element...`
-                    : "Tell the AI what to change..."
+                    ? formatMessage("sidebar.describeChangesForSelectedElementWithTag", {
+                        tag: selectedElement.tagName.toLowerCase(),
+                      })
+                    : t("sidebar.tellAiWhatToChange")
                 }
                 onChange={(e) => {
                   setUpdateInstruction(e.target.value);
@@ -561,7 +595,11 @@ function Sidebar({
                           ? "bg-violet-100 text-violet-600 dark:bg-violet-900/30 dark:text-violet-400"
                           : "text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:text-zinc-500 dark:hover:bg-zinc-800 dark:hover:text-zinc-300"
                       }`}
-                      title={inSelectAndEditMode ? "Exit selection mode" : "Select an element in the preview to target your edit"}
+                      title={
+                        inSelectAndEditMode
+                          ? t("sidebar.exitSelectionMode")
+                          : t("sidebar.selectElementToTargetEdit")
+                      }
                     >
                       <LuMousePointerClick className="w-[18px] h-[18px]" />
                     </button>
@@ -575,7 +613,7 @@ function Sidebar({
                       ? "bg-violet-600 text-white hover:bg-violet-700 dark:bg-violet-500 dark:hover:bg-violet-400"
                       : "cursor-not-allowed bg-gray-200 text-gray-400 dark:bg-zinc-700 dark:text-zinc-500"
                   }`}
-                  title="Send"
+                  title={t("common.send")}
                 >
                   <LuArrowUp className="w-[18px] h-[18px]" strokeWidth={2.5} />
                 </button>
@@ -583,7 +621,9 @@ function Sidebar({
 
               {isDragging && (
                 <div className="absolute inset-0 bg-blue-50/90 dark:bg-gray-800/90 border-2 border-dashed border-blue-400 dark:border-blue-600 rounded-xl flex items-center justify-center pointer-events-none z-10">
-                  <p className="text-blue-600 dark:text-blue-400 font-medium">Drop images here</p>
+                  <p className="text-blue-600 dark:text-blue-400 font-medium">
+                    {t("sidebar.dropImagesHere")}
+                  </p>
                 </div>
               )}
             </div>

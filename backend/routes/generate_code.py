@@ -20,6 +20,9 @@ from config import (
 from custom_types import InputMode
 from llm import (
     Llm,
+    ANTHROPIC_MODELS,
+    GEMINI_MODELS,
+    OPENAI_MODELS,
 )
 from typing import (
     Any,
@@ -236,6 +239,7 @@ class ExtractedParams:
     history: List[PromptHistoryMessage]
     file_state: Dict[str, str] | None
     option_codes: List[str]
+    code_generation_model: Llm | None = None
 
 
 class ParameterExtractionStage:
@@ -284,6 +288,22 @@ class ParameterExtractionStage:
         if not openai_base_url:
             print("Using official OpenAI URL")
 
+        code_generation_model: Llm | None = None
+        raw_code_generation_model = params.get("codeGenerationModel")
+        if raw_code_generation_model not in (None, "", "auto"):
+            if not isinstance(raw_code_generation_model, str):
+                await self.throw_error("Invalid code generation model")
+                raise ValueError("Invalid code generation model")
+            try:
+                code_generation_model = Llm(raw_code_generation_model)
+            except ValueError as exc:
+                await self.throw_error(
+                    f"Unsupported code generation model: {raw_code_generation_model}"
+                )
+                raise ValueError(
+                    f"Unsupported code generation model: {raw_code_generation_model}"
+                ) from exc
+
         # Get the image generation flag from the request. Fall back to True if not provided.
         should_generate_images = bool(params.get("isImageGenerationEnabled", True))
 
@@ -330,6 +350,7 @@ class ParameterExtractionStage:
             anthropic_api_key=anthropic_api_key,
             gemini_api_key=gemini_api_key,
             openai_base_url=openai_base_url,
+            code_generation_model=code_generation_model,
             generation_type=generation_type,
             prompt=prompt,
             history=history,
@@ -366,18 +387,29 @@ class ModelSelectionStage:
         openai_api_key: str | None,
         anthropic_api_key: str | None,
         gemini_api_key: str | None = None,
+        selected_model: Llm | None = None,
     ) -> List[Llm]:
         """Select appropriate models based on available API keys"""
         try:
             num_variants = 2 if generation_type == "update" else NUM_VARIANTS
-            variant_models = self._get_variant_models(
-                generation_type,
-                input_mode,
-                num_variants,
-                openai_api_key,
-                anthropic_api_key,
-                gemini_api_key,
-            )
+            if selected_model is not None:
+                self._validate_selected_model(
+                    selected_model=selected_model,
+                    input_mode=input_mode,
+                    openai_api_key=openai_api_key,
+                    anthropic_api_key=anthropic_api_key,
+                    gemini_api_key=gemini_api_key,
+                )
+                variant_models = [selected_model for _ in range(num_variants)]
+            else:
+                variant_models = self._get_variant_models(
+                    generation_type,
+                    input_mode,
+                    num_variants,
+                    openai_api_key,
+                    anthropic_api_key,
+                    gemini_api_key,
+                )
 
             # Print the variant models (one per line)
             print("Variant models:")
@@ -385,13 +417,45 @@ class ModelSelectionStage:
                 print(f"Variant {index + 1}: {model.value}")
 
             return variant_models
-        except Exception:
-            await self.throw_error(
+        except Exception as exc:
+            message = str(exc).strip() or (
                 "No OpenAI, Anthropic, or Gemini API key found. Please add the environment variable "
                 "OPENAI_API_KEY, ANTHROPIC_API_KEY, or GEMINI_API_KEY to backend/.env or in the settings dialog. "
                 "If you add it to .env, make sure to restart the backend server."
             )
-            raise Exception("No API key")
+            await self.throw_error(message)
+            raise Exception(message) from exc
+
+    def _validate_selected_model(
+        self,
+        selected_model: Llm,
+        input_mode: InputMode,
+        openai_api_key: str | None,
+        anthropic_api_key: str | None,
+        gemini_api_key: str | None,
+    ) -> None:
+        if input_mode == "video" and selected_model not in VIDEO_VARIANT_MODELS:
+            raise Exception(
+                "Video mode only supports Gemini video models. "
+                "Please choose a Gemini video model in settings."
+            )
+
+        if selected_model in OPENAI_MODELS:
+            if not openai_api_key:
+                raise Exception("Selected model requires an OpenAI API key.")
+            return
+
+        if selected_model in ANTHROPIC_MODELS:
+            if not anthropic_api_key:
+                raise Exception("Selected model requires an Anthropic API key.")
+            return
+
+        if selected_model in GEMINI_MODELS:
+            if not gemini_api_key:
+                raise Exception("Selected model requires a Gemini API key.")
+            return
+
+        raise Exception(f"Unsupported selected model: {selected_model.value}")
 
     def _get_variant_models(
         self,
@@ -727,6 +791,7 @@ class CodeGenerationMiddleware(Middleware):
                 openai_api_key=context.extracted_params.openai_api_key,
                 anthropic_api_key=context.extracted_params.anthropic_api_key,
                 gemini_api_key=context.extracted_params.gemini_api_key,
+                selected_model=context.extracted_params.code_generation_model,
             )
             if IS_DEBUG_ENABLED:
                 await context.send_message(

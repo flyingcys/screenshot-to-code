@@ -2,6 +2,7 @@ import { useRef } from "react";
 import { toast } from "react-hot-toast";
 import { Cross2Icon } from "@radix-ui/react-icons";
 import { LuPlus } from "react-icons/lu";
+import { useI18n } from "../lib/i18n";
 
 const MAX_UPDATE_IMAGES = 5;
 
@@ -21,6 +22,13 @@ interface Props {
 }
 
 export function UpdateImagePreview({ updateImages, setUpdateImages }: Props) {
+  const { t } = useI18n();
+  const formatMessage = (key: Parameters<typeof t>[0], replacements: Record<string, string | number>) =>
+    Object.entries(replacements).reduce(
+      (message, [placeholder, value]) =>
+        message.split(`{${placeholder}}`).join(String(value)),
+      t(key),
+    );
   const removeImage = (index: number) => {
     const newImages = updateImages.filter((_, i) => i !== index);
     setUpdateImages(newImages);
@@ -36,7 +44,7 @@ export function UpdateImagePreview({ updateImages, setUpdateImages }: Props) {
             <div className="flex h-14 w-14 items-center justify-center rounded-lg border border-gray-200 bg-white p-1 shadow-sm dark:border-zinc-700 dark:bg-zinc-900">
               <img
                 src={image}
-                alt={`Reference ${index + 1}`}
+                alt={formatMessage("updateImages.referenceImageAlt", { index: index + 1 })}
                 className="max-h-full max-w-full object-contain"
               />
             </div>
@@ -57,13 +65,18 @@ function UpdateImageUpload({ updateImages, setUpdateImages }: Props) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const remaining = Math.max(0, MAX_UPDATE_IMAGES - updateImages.length);
   const isAtLimit = remaining === 0;
+  const { t } = useI18n();
+  const formatMessage = (key: Parameters<typeof t>[0], replacements: Record<string, string | number>) =>
+    Object.entries(replacements).reduce(
+      (message, [placeholder, value]) =>
+        message.split(`{${placeholder}}`).join(String(value)),
+      t(key),
+    );
 
 
   const handleButtonClick = () => {
     if (isAtLimit) {
-      toast.error(
-        `You’ve reached the limit of ${MAX_UPDATE_IMAGES} reference images. Remove one to add another.`
-      );
+      toast.error(formatMessage("updateImages.limitReached", { max: MAX_UPDATE_IMAGES }));
       return;
     }
     fileInputRef.current?.click();
@@ -74,9 +87,7 @@ function UpdateImageUpload({ updateImages, setUpdateImages }: Props) {
     if (files) {
       try {
         if (updateImages.length >= MAX_UPDATE_IMAGES) {
-          toast.error(
-            `You’ve reached the limit of ${MAX_UPDATE_IMAGES} reference images. Remove one to add another.`
-          );
+          toast.error(formatMessage("updateImages.limitReached", { max: MAX_UPDATE_IMAGES }));
           return;
         }
 
@@ -84,9 +95,10 @@ function UpdateImageUpload({ updateImages, setUpdateImages }: Props) {
         let filesToAdd = Array.from(files);
         if (filesToAdd.length > remainingSlots) {
           toast.error(
-            `Only ${remainingSlots} more image${
-              remainingSlots === 1 ? "" : "s"
-            } will be added to stay within the ${MAX_UPDATE_IMAGES}-image limit.`
+            formatMessage("updateImages.onlyMoreWillBeAdded", {
+              remaining: remainingSlots,
+              max: MAX_UPDATE_IMAGES,
+            })
           );
           filesToAdd = filesToAdd.slice(0, remainingSlots);
         }
@@ -96,8 +108,8 @@ function UpdateImageUpload({ updateImages, setUpdateImages }: Props) {
         setUpdateImages([...updateImages, ...newImages]);
         e.target.value = "";
       } catch (error) {
-        toast.error("Error reading image files");
-        console.error("Error reading files:", error);
+        toast.error(t("updateImages.errorReading"));
+        console.error(t("updateImages.errorReading"), error);
       }
     }
   };
@@ -123,8 +135,8 @@ function UpdateImageUpload({ updateImages, setUpdateImages }: Props) {
         }`}
         title={
           isAtLimit
-            ? `Limit reached (${MAX_UPDATE_IMAGES})`
-            : "Add images"
+            ? formatMessage("updateImages.limitReachedTitle", { max: MAX_UPDATE_IMAGES })
+            : t("updateImages.addImages")
         }
       >
         <LuPlus className="w-[18px] h-[18px]" />

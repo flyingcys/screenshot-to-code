@@ -1,5 +1,7 @@
 // Keep in sync with backend (llm.py)
 // Order here matches dropdown order
+export const AUTO_CODE_GENERATION_MODEL = "auto";
+
 export enum CodeGenerationModel {
   CLAUDE_OPUS_4_6 = "claude-opus-4-6",
   CLAUDE_SONNET_4_6 = "claude-sonnet-4-6",
@@ -13,6 +15,11 @@ export enum CodeGenerationModel {
   GPT_5_3_CODEX_MEDIUM = "gpt-5.3-codex (medium thinking)",
   GPT_5_3_CODEX_HIGH = "gpt-5.3-codex (high thinking)",
   GPT_5_3_CODEX_XHIGH = "gpt-5.3-codex (xhigh thinking)",
+  GPT_5_4_2026_03_05_NONE = "gpt-5.4-2026-03-05 (no thinking)",
+  GPT_5_4_2026_03_05_LOW = "gpt-5.4-2026-03-05 (low thinking)",
+  GPT_5_4_2026_03_05_MEDIUM = "gpt-5.4-2026-03-05 (medium thinking)",
+  GPT_5_4_2026_03_05_HIGH = "gpt-5.4-2026-03-05 (high thinking)",
+  GPT_5_4_2026_03_05_XHIGH = "gpt-5.4-2026-03-05 (xhigh thinking)",
   GEMINI_3_FLASH_PREVIEW_HIGH = "gemini-3-flash-preview (high thinking)",
   GEMINI_3_FLASH_PREVIEW_MINIMAL = "gemini-3-flash-preview (minimal thinking)",
   GEMINI_3_1_PRO_PREVIEW_HIGH = "gemini-3.1-pro-preview (high thinking)",
@@ -56,6 +63,26 @@ export const CODE_GENERATION_MODEL_DESCRIPTIONS: {
     name: "GPT 5.3 Codex (xhigh)",
     inBeta: true,
   },
+  "gpt-5.4-2026-03-05 (no thinking)": {
+    name: "GPT 5.4 (none)",
+    inBeta: true,
+  },
+  "gpt-5.4-2026-03-05 (low thinking)": {
+    name: "GPT 5.4 (low)",
+    inBeta: true,
+  },
+  "gpt-5.4-2026-03-05 (medium thinking)": {
+    name: "GPT 5.4 (medium)",
+    inBeta: true,
+  },
+  "gpt-5.4-2026-03-05 (high thinking)": {
+    name: "GPT 5.4 (high)",
+    inBeta: true,
+  },
+  "gpt-5.4-2026-03-05 (xhigh thinking)": {
+    name: "GPT 5.4 (xhigh)",
+    inBeta: true,
+  },
   "claude-opus-4-5-20251101": { name: "Claude Opus 4.5", inBeta: false },
   "claude-opus-4-6": { name: "Claude Opus 4.6", inBeta: false },
   "claude-sonnet-4-6": { name: "Claude Sonnet 4.6", inBeta: false },
@@ -81,3 +108,10 @@ export const CODE_GENERATION_MODEL_DESCRIPTIONS: {
     inBeta: true,
   },
 };
+
+export const CODE_GENERATION_MODEL_OPTIONS = Object.values(
+  CodeGenerationModel
+).map((value) => ({
+  value,
+  ...CODE_GENERATION_MODEL_DESCRIPTIONS[value],
+}));

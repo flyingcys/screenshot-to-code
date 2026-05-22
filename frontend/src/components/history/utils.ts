@@ -1,13 +1,14 @@
 import { Commit, CommitType } from "../commits/types";
+import { t, TranslationLocale } from "../../lib/i18n";
 
-function displayHistoryItemType(itemType: CommitType) {
+function displayHistoryItemType(itemType: CommitType, locale: TranslationLocale) {
   switch (itemType) {
     case "ai_create":
-      return "Create";
+      return t("history.create", locale);
     case "ai_edit":
-      return "Edit";
+      return t("history.edit", locale);
     case "code_create":
-      return "Imported from code";
+      return t("history.importedFromCode", locale);
     default: {
       const exhaustiveCheck: never = itemType;
       throw new Error(`Unhandled case: ${exhaustiveCheck}`);
@@ -16,7 +17,6 @@ function displayHistoryItemType(itemType: CommitType) {
 }
 
 const setParentVersion = (commit: Commit, history: Commit[]) => {
-  // If the commit has no parent, return null
   if (!commit.parentHash) return null;
 
   const parentIndex = history.findIndex(
@@ -24,8 +24,6 @@ const setParentVersion = (commit: Commit, history: Commit[]) => {
   );
   const currentIndex = history.findIndex((item) => item.hash === commit.hash);
 
-  // Only set parent version if the parent is not the previous commit
-  // and parent exists
   return parentIndex !== -1 && parentIndex != currentIndex - 1
     ? parentIndex + 1
     : null;
@@ -46,15 +44,18 @@ function getCommitMedia(commit: Commit): { images: string[]; videos: string[] } 
   };
 }
 
-export function summarizeHistoryItem(commit: Commit): string {
+export function summarizeHistoryItem(
+  commit: Commit,
+  locale: TranslationLocale
+): string {
   const commitType = commit.type;
   switch (commitType) {
     case "ai_create":
-      return "Create";
+      return t("history.create", locale);
     case "ai_edit":
-      return commit.inputs.text || "Edit";
+      return commit.inputs.text || t("history.edit", locale);
     case "code_create":
-      return "Imported from code";
+      return t("history.importedFromCode", locale);
     default: {
       const exhaustiveCheck: never = commitType;
       throw new Error(`Unhandled case: ${exhaustiveCheck}`);
@@ -78,7 +79,10 @@ export type RenderedHistoryItem = Omit<Commit, "type"> & {
   videos: string[];
 };
 
-export const renderHistory = (history: Commit[]): RenderedHistoryItem[] => {
+export const renderHistory = (
+  history: Commit[],
+  locale: TranslationLocale
+): RenderedHistoryItem[] => {
   const renderedHistory: RenderedHistoryItem[] = [];
 
   for (let i = 0; i < history.length; i++) {
@@ -86,8 +90,8 @@ export const renderHistory = (history: Commit[]): RenderedHistoryItem[] => {
     const media = getCommitMedia(commit);
     renderedHistory.push({
       ...commit,
-      type: displayHistoryItemType(commit.type),
-      summary: summarizeHistoryItem(commit),
+      type: displayHistoryItemType(commit.type, locale),
+      summary: summarizeHistoryItem(commit, locale),
       selectedElementTag: getSelectedElementTag(commit),
       parentVersion: setParentVersion(commit, history),
       images: media.images,

@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { generateCode } from "./generateCode";
-import { AppState, AppTheme, EditorTheme, Settings } from "./types";
+import { AppState, AppTheme, Settings } from "./types";
 import { IS_RUNNING_ON_CLOUD } from "./config";
 import { PicoBadge } from "./components/messages/PicoBadge";
 import { OnboardingNote } from "./components/messages/OnboardingNote";
@@ -10,7 +10,6 @@ import { USER_CLOSE_WEB_SOCKET_CODE } from "./constants";
 import toast from "react-hot-toast";
 import { nanoid } from "nanoid";
 import { Stack } from "./lib/stacks";
-import { CodeGenerationModel } from "./lib/models";
 import useBrowserTabIndicator from "./hooks/useBrowserTabIndicator";
 import { LuChevronLeft } from "react-icons/lu";
 import {
@@ -33,6 +32,8 @@ import StartPane from "./components/start-pane/StartPane";
 import SettingsTab from "./components/settings/SettingsTab";
 import { Commit } from "./components/commits/types";
 import { createCommit } from "./components/commits/utils";
+import { I18nProvider, resolveLocale, t as translate } from "./lib/i18n";
+import { createDefaultSettings, mergeSettings } from "./lib/settings";
 
 function App() {
   const {
@@ -81,19 +82,7 @@ function App() {
 
   // Settings
   const [settings, setSettings] = usePersistedState<Settings>(
-    {
-      openAiApiKey: null,
-      openAiBaseURL: null,
-      anthropicApiKey: null,
-      geminiApiKey: null,
-      screenshotOneApiKey: null,
-      isImageGenerationEnabled: true,
-      editorTheme: EditorTheme.COBALT,
-      generatedCodeConfig: Stack.HTML_TAILWIND,
-      codeGenerationModel: CodeGenerationModel.CLAUDE_4_5_OPUS_2025_11_01,
-      // Only relevant for hosted version
-      isTermOfServiceAccepted: false,
-    },
+    createDefaultSettings(),
     "setting"
   );
   const [appTheme, setAppTheme] = usePersistedState<AppTheme>(
@@ -120,13 +109,11 @@ function App() {
   // do not get added to the settings so if it's falsy, we populate it with the default
   // value
   useEffect(() => {
-    if (!settings.generatedCodeConfig) {
-      setSettings((prev) => ({
-        ...prev,
-        generatedCodeConfig: Stack.HTML_TAILWIND,
-      }));
+    const normalizedSettings = mergeSettings(settings);
+    if (JSON.stringify(normalizedSettings) !== JSON.stringify(settings)) {
+      setSettings(normalizedSettings);
     }
-  }, [settings.generatedCodeConfig, setSettings]);
+  }, [settings, setSettings]);
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
@@ -152,6 +139,16 @@ function App() {
     };
   }, [appTheme]);
 
+  const resolvedLocale = useMemo(
+    () =>
+      resolveLocale(
+        settings.locale,
+        typeof navigator !== "undefined" ? navigator.language : undefined
+      ),
+    [settings.locale]
+  );
+  const tt = (key: Parameters<typeof translate>[0]) => translate(key, resolvedLocale);
+
   const getAssetsById = () => useProjectStore.getState().assetsById;
 
   // Functions
@@ -173,16 +170,14 @@ function App() {
 
   const regenerate = () => {
     if (head === null) {
-      toast.error(
-        "No current version set. Please contact support via chat or Github."
-      );
+      toast.error(tt("app.noCurrentVersionSet"));
       throw new Error("Regenerate called with no head");
     }
 
     // Retrieve the previous command
     const currentCommit = commits[head];
     if (currentCommit.type !== "ai_create") {
-      toast.error("Only the first version can be regenerated.");
+      toast.error(tt("common.onlyFirstVersionCanBeRegenerated"));
       return;
     }
 
@@ -436,12 +431,12 @@ function App() {
           const latestCreateCommit = useProjectStore.getState().commits[commit.hash];
           latestCreateCommit?.variants.forEach((variant, variantIndex) => {
             if (variant.status === "generating") {
-              updateVariantStatus(
-                commit.hash,
-                variantIndex,
-                "error",
-                errorMessage || "Generation failed. Please retry."
-              );
+                updateVariantStatus(
+                  commit.hash,
+                  variantIndex,
+                  "error",
+                  errorMessage || tt("common.generationFailed")
+                );
             }
           });
           setAppState(AppState.CODE_READY);
@@ -527,14 +522,12 @@ function App() {
   // Subsequent updates
   async function doUpdate(updateInstruction: string) {
     if (updateInstruction.trim() === "") {
-      toast.error("Please include some instructions for AI on what to update.");
+      toast.error(tt("sidebar.tellAiWhatToChange"));
       return;
     }
 
     if (head === null) {
-      toast.error(
-        "No current version set. Contact support or open a Github issue."
-      );
+      toast.error(tt("app.noCurrentVersionSetForUpdate"));
       throw new Error("Update called with no head");
     }
 
@@ -643,58 +636,59 @@ function App() {
   const showMobileChatPane = showContentPanel && mobilePane === "chat";
 
   return (
-    <div
-      className={`dark:bg-black dark:text-white ${
-        appState === AppState.CODING || appState === AppState.CODE_READY
-          ? "flex h-dvh flex-col overflow-hidden lg:block lg:h-screen"
-          : "min-h-screen"
-      }`}
-    >
-      {IS_RUNNING_ON_CLOUD && <PicoBadge />}
-      {IS_RUNNING_ON_CLOUD && (
-        <TermsOfServiceDialog
-          open={!settings.isTermOfServiceAccepted}
-          onOpenChange={handleTermDialogOpenChange}
-        />
-      )}
-
-      {/* Icon strip - always visible */}
+    <I18nProvider locale={resolvedLocale}>
       <div
-        className="sticky top-0 z-50 lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-16 lg:flex-col"
+        className={`dark:bg-black dark:text-white ${
+          appState === AppState.CODING || appState === AppState.CODE_READY
+            ? "flex h-dvh flex-col overflow-hidden lg:block lg:h-screen"
+            : "min-h-screen"
+        }`}
       >
-        <IconStrip
-          isHistoryOpen={isHistoryOpen}
-          isEditorOpen={!isHistoryOpen && !isSettingsOpen}
-          isSettingsOpen={isSettingsOpen}
-          showHistory={isCodingOrReady}
-          showEditor={isCodingOrReady}
-          onToggleHistory={() => {
-            setIsHistoryOpen((prev) => !prev);
-            setIsSettingsOpen(false);
-            setMobilePane("chat");
-          }}
-          onToggleEditor={() => {
-            setIsHistoryOpen(false);
-            setIsSettingsOpen(false);
-            setMobilePane("preview");
-          }}
-          onLogoClick={() => {
-            setIsHistoryOpen(false);
-            setIsSettingsOpen(false);
-            setMobilePane("preview");
-          }}
-          onNewProject={() => {
-            reset();
-            setIsHistoryOpen(false);
-            setIsSettingsOpen(false);
-            setMobilePane("preview");
-          }}
-          onOpenSettings={() => {
-            setIsSettingsOpen(true);
-            setIsHistoryOpen(false);
-          }}
-        />
-      </div>
+        {IS_RUNNING_ON_CLOUD && <PicoBadge />}
+        {IS_RUNNING_ON_CLOUD && (
+          <TermsOfServiceDialog
+            open={!settings.isTermOfServiceAccepted}
+            onOpenChange={handleTermDialogOpenChange}
+          />
+        )}
+
+        {/* Icon strip - always visible */}
+        <div
+          className="sticky top-0 z-50 lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-16 lg:flex-col"
+        >
+          <IconStrip
+            isHistoryOpen={isHistoryOpen}
+            isEditorOpen={!isHistoryOpen && !isSettingsOpen}
+            isSettingsOpen={isSettingsOpen}
+            showHistory={isCodingOrReady}
+            showEditor={isCodingOrReady}
+            onToggleHistory={() => {
+              setIsHistoryOpen((prev) => !prev);
+              setIsSettingsOpen(false);
+              setMobilePane("chat");
+            }}
+            onToggleEditor={() => {
+              setIsHistoryOpen(false);
+              setIsSettingsOpen(false);
+              setMobilePane("preview");
+            }}
+            onLogoClick={() => {
+              setIsHistoryOpen(false);
+              setIsSettingsOpen(false);
+              setMobilePane("preview");
+            }}
+            onNewProject={() => {
+              reset();
+              setIsHistoryOpen(false);
+              setIsSettingsOpen(false);
+              setMobilePane("preview");
+            }}
+            onOpenSettings={() => {
+              setIsSettingsOpen(true);
+              setIsHistoryOpen(false);
+            }}
+          />
+        </div>
 
       {isCodingOrReady && !isSettingsOpen && (
         <div className="border-b border-gray-200 bg-white px-4 py-2 dark:border-zinc-800 dark:bg-zinc-950 lg:hidden">
@@ -710,7 +704,7 @@ function App() {
                   : "text-gray-500 dark:text-zinc-400"
               }`}
             >
-              Preview
+              {tt("common.preview")}
             </button>
             <button
               onClick={() => setMobilePane("chat")}
@@ -720,7 +714,7 @@ function App() {
                   : "text-gray-500 dark:text-zinc-400"
               }`}
             >
-              Chat
+              {tt("common.chat")}
             </button>
           </div>
         </div>
@@ -737,13 +731,15 @@ function App() {
               <div className="flex-1 overflow-y-auto sidebar-scrollbar-stable px-4">
                 <div className="mt-3">
                   <div className="flex items-center justify-between mb-3 px-1">
-                    <h2 className="text-xs font-medium uppercase tracking-wider text-gray-400 dark:text-gray-500">Versions</h2>
+                    <h2 className="text-xs font-medium uppercase tracking-wider text-gray-400 dark:text-gray-500">
+                      {tt("common.versions")}
+                    </h2>
                     <button
                       onClick={() => setIsHistoryOpen(false)}
                       className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
                     >
                       <LuChevronLeft className="w-3.5 h-3.5" />
-                      Back to editor
+                      {tt("common.backToEditor")}
                     </button>
                   </div>
                   <HistoryDisplay />
@@ -815,7 +811,8 @@ function App() {
           </>
         )}
       </main>
-    </div>
+      </div>
+    </I18nProvider>
   );
 }
 

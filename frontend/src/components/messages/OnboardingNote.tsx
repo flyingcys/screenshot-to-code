@@ -1,25 +1,28 @@
+import { useI18n } from "../../lib/i18n";
+
 export function OnboardingNote() {
+  const { t } = useI18n();
+
   return (
     <div className="flex flex-col space-y-4 bg-green-700 p-2 rounded text-stone-200 text-sm">
       <span>
-        To use Screenshot to Code,{" "}
+        {t("onboarding.intro")}{" "}
         <a
           className="inline underline hover:opacity-70"
           href="https://buy.stripe.com/8wM6sre70gBW1nqaEE"
           target="_blank"
         >
-          buy some credits (100 generations for $36)
+          {t("onboarding.buyCredits")}
         </a>{" "}
-        or use your own OpenAI API key with GPT4 vision access.{" "}
+        {t("onboarding.orUseOwnKey")}{" "}
         <a
           href="https://github.com/abi/screenshot-to-code/blob/main/Troubleshooting.md"
           className="inline underline hover:opacity-70"
           target="_blank"
         >
-          Follow these instructions to get yourself a key.
+          {t("onboarding.getKeyInstructions")}
         </a>{" "}
-        and paste it in the Settings dialog (gear icon above). Your key is only
-        stored in your browser. Never stored on our servers.
+        {t("onboarding.settingsDialog")} {t("onboarding.storedInBrowser")}
       </span>
     </div>
   );

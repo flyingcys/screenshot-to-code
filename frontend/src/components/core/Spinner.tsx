@@ -17,7 +17,7 @@ function Spinner() {
           fill="currentFill"
         />
       </svg>
-      <span className="sr-only">Loading...</span>
+      <span className="sr-only">加载中...</span>
     </div>
   );
 }

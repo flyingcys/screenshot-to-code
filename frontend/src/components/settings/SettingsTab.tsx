@@ -1,6 +1,18 @@
 import React from "react";
-import { AppTheme, EditorTheme, Settings } from "../../types";
+import {
+  AppTheme,
+  CodeGenerationModelSetting,
+  EditorTheme,
+  Locale,
+  Settings,
+} from "../../types";
 import { capitalize } from "../../lib/utils";
+import {
+  CODE_GENERATION_MODEL_DESCRIPTIONS,
+  CODE_GENERATION_MODEL_OPTIONS,
+  AUTO_CODE_GENERATION_MODEL,
+  CodeGenerationModel,
+} from "../../lib/models";
 import {
   Select,
   SelectContent,
@@ -10,6 +22,8 @@ import {
 import { Input } from "../ui/input";
 import { Switch } from "../ui/switch";
 import { IS_RUNNING_ON_CLOUD } from "../../config";
+import { normalizeLocale } from "../../lib/settings";
+import { useI18n } from "../../lib/i18n";
 
 interface Props {
   settings: Settings;
@@ -19,10 +33,26 @@ interface Props {
 }
 
 function SettingsTab({ settings, setSettings, appTheme, setAppTheme }: Props) {
+  const { t } = useI18n();
+
   const handleThemeChange = (theme: EditorTheme) => {
     setSettings((s) => ({
       ...s,
       editorTheme: theme,
+    }));
+  };
+
+  const handleLocaleChange = (locale: Locale) => {
+    setSettings((s) => ({
+      ...s,
+      locale: normalizeLocale(locale),
+    }));
+  };
+
+  const handleModelChange = (model: CodeGenerationModelSetting) => {
+    setSettings((s) => ({
+      ...s,
+      codeGenerationModel: model,
     }));
   };
 
@@ -32,7 +62,7 @@ function SettingsTab({ settings, setSettings, appTheme, setAppTheme }: Props) {
         {/* Header */}
         <div className="mb-6">
           <h1 className="text-lg font-semibold text-gray-900 dark:text-white">
-            Settings
+            {t("settings.title")}
           </h1>
         </div>
 
@@ -41,17 +71,17 @@ function SettingsTab({ settings, setSettings, appTheme, setAppTheme }: Props) {
           <div className="rounded-lg border border-gray-200 bg-white dark:border-zinc-700 dark:bg-zinc-800/60">
             <div className="border-b border-gray-100 px-4 py-3 dark:border-zinc-700">
               <h2 className="text-sm font-medium text-gray-900 dark:text-white">
-                Theme
+                {t("settings.theme")}
               </h2>
             </div>
             <div className="divide-y divide-gray-100 dark:divide-zinc-700">
               <div className="flex items-center justify-between px-4 py-3">
                 <div>
                   <span className="text-sm text-gray-700 dark:text-zinc-300">
-                    App Theme
+                    {t("settings.appTheme")}
                   </span>
                   <p className="mt-0.5 text-xs text-gray-500 dark:text-zinc-400">
-                    System default, with optional light/dark override
+                    {t("settings.appThemeHelp")}
                   </p>
                 </div>
                 <Select
@@ -60,22 +90,26 @@ function SettingsTab({ settings, setSettings, appTheme, setAppTheme }: Props) {
                   onValueChange={(value) => setAppTheme(value as AppTheme)}
                 >
                   <SelectTrigger className="w-[140px]">
-                    {capitalize(appTheme)}
+                    {appTheme === AppTheme.SYSTEM
+                      ? t("settings.followSystem")
+                      : appTheme === AppTheme.LIGHT
+                        ? t("settings.light")
+                        : t("settings.dark")}
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value={AppTheme.SYSTEM}>System</SelectItem>
-                    <SelectItem value={AppTheme.LIGHT}>Light</SelectItem>
-                    <SelectItem value={AppTheme.DARK}>Dark</SelectItem>
+                    <SelectItem value={AppTheme.SYSTEM}>{t("settings.followSystem")}</SelectItem>
+                    <SelectItem value={AppTheme.LIGHT}>{t("settings.light")}</SelectItem>
+                    <SelectItem value={AppTheme.DARK}>{t("settings.dark")}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div className="flex items-center justify-between px-4 py-3">
                 <div>
                   <span className="text-sm text-gray-700 dark:text-zinc-300">
-                    Code Editor Theme
+                    {t("settings.codeEditorTheme")}
                   </span>
                   <p className="mt-0.5 text-xs text-gray-500 dark:text-zinc-400">
-                    Requires page refresh to update
+                    {t("settings.codeEditorThemeHelp")}
                   </p>
                 </div>
                 <Select
@@ -100,6 +134,34 @@ function SettingsTab({ settings, setSettings, appTheme, setAppTheme }: Props) {
                   </SelectContent>
                 </Select>
               </div>
+              <div className="flex items-center justify-between px-4 py-3">
+                <div>
+                  <span className="text-sm text-gray-700 dark:text-zinc-300">
+                    {t("settings.uiLanguage")}
+                  </span>
+                  <p className="mt-0.5 text-xs text-gray-500 dark:text-zinc-400">
+                    {t("settings.uiLanguageHelp")}
+                  </p>
+                </div>
+                <Select
+                  name="ui-language"
+                  value={settings.locale}
+                  onValueChange={handleLocaleChange}
+                >
+                  <SelectTrigger className="w-[160px]">
+                    {settings.locale === "auto"
+                      ? t("settings.followSystem")
+                      : settings.locale === "zh"
+                        ? t("settings.chinese")
+                        : t("settings.english")}
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="auto">{t("settings.followSystem")}</SelectItem>
+                    <SelectItem value="zh">{t("settings.chinese")}</SelectItem>
+                    <SelectItem value="en">{t("settings.english")}</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </div>
 
@@ -107,22 +169,21 @@ function SettingsTab({ settings, setSettings, appTheme, setAppTheme }: Props) {
           <div className="rounded-lg border border-gray-200 bg-white dark:border-zinc-700 dark:bg-zinc-800/60">
             <div className="border-b border-gray-100 px-4 py-3 dark:border-zinc-700">
               <h2 className="text-sm font-medium text-gray-900 dark:text-white">
-                API Keys
+                {t("settings.apiKeys")}
               </h2>
             </div>
             <div className="space-y-4 p-4">
               <div>
                 <p className="text-sm font-medium text-gray-700 dark:text-zinc-300">
-                  OpenAI API key
+                  {t("settings.openAiApiKey")}
                 </p>
                 <p className="mt-1 text-xs text-gray-500 dark:text-zinc-400">
-                  Only stored in your browser. Never stored on servers. Overrides
-                  your .env config.
+                  {t("settings.openAiApiKeyHelp")}
                 </p>
                 <Input
                   id="openai-api-key"
                   className="mt-2"
-                  placeholder="OpenAI API key"
+                  placeholder={t("settings.openAiApiKey")}
                   value={settings.openAiApiKey || ""}
                   onChange={(e) =>
                     setSettings((s) => ({
@@ -136,16 +197,15 @@ function SettingsTab({ settings, setSettings, appTheme, setAppTheme }: Props) {
               {!IS_RUNNING_ON_CLOUD && (
                 <div>
                   <p className="text-sm font-medium text-gray-700 dark:text-zinc-300">
-                    OpenAI Base URL (optional)
+                    {t("settings.openAiBaseUrl")}
                   </p>
                   <p className="mt-1 text-xs text-gray-500 dark:text-zinc-400">
-                    Replace with a proxy URL if you don't want to use the
-                    default.
+                    {t("settings.openAiBaseUrlHelp")}
                   </p>
                   <Input
                     id="openai-base-url"
                     className="mt-2"
-                    placeholder="OpenAI Base URL"
+                    placeholder={t("settings.openAiBaseUrl")}
                     value={settings.openAiBaseURL || ""}
                     onChange={(e) =>
                       setSettings((s) => ({
@@ -159,16 +219,15 @@ function SettingsTab({ settings, setSettings, appTheme, setAppTheme }: Props) {
 
               <div>
                 <p className="text-sm font-medium text-gray-700 dark:text-zinc-300">
-                  Anthropic API key
+                  {t("settings.anthropicApiKey")}
                 </p>
                 <p className="mt-1 text-xs text-gray-500 dark:text-zinc-400">
-                  Only stored in your browser. Never stored on servers. Overrides
-                  your .env config.
+                  {t("settings.anthropicApiKeyHelp")}
                 </p>
                 <Input
                   id="anthropic-api-key"
                   className="mt-2"
-                  placeholder="Anthropic API key"
+                  placeholder={t("settings.anthropicApiKey")}
                   value={settings.anthropicApiKey || ""}
                   onChange={(e) =>
                     setSettings((s) => ({
@@ -181,16 +240,15 @@ function SettingsTab({ settings, setSettings, appTheme, setAppTheme }: Props) {
 
               <div>
                 <p className="text-sm font-medium text-gray-700 dark:text-zinc-300">
-                  Gemini API key
+                  {t("settings.geminiApiKey")}
                 </p>
                 <p className="mt-1 text-xs text-gray-500 dark:text-zinc-400">
-                  Only stored in your browser. Never stored on servers. Overrides
-                  your .env config.
+                  {t("settings.geminiApiKeyHelp")}
                 </p>
                 <Input
                   id="gemini-api-key"
                   className="mt-2"
-                  placeholder="Gemini API key"
+                  placeholder={t("settings.geminiApiKey")}
                   value={settings.geminiApiKey || ""}
                   onChange={(e) =>
                     setSettings((s) => ({
@@ -203,21 +261,68 @@ function SettingsTab({ settings, setSettings, appTheme, setAppTheme }: Props) {
             </div>
           </div>
 
+          {/* Code Generation */}
+          <div className="rounded-lg border border-gray-200 bg-white dark:border-zinc-700 dark:bg-zinc-800/60">
+            <div className="border-b border-gray-100 px-4 py-3 dark:border-zinc-700">
+              <h2 className="text-sm font-medium text-gray-900 dark:text-white">
+                {t("settings.codeGeneration")}
+              </h2>
+            </div>
+            <div className="p-4">
+              <div className="flex items-center justify-between gap-4">
+                <div>
+                  <p className="text-sm font-medium text-gray-700 dark:text-zinc-300">
+                    {t("settings.codeGenerationModel")}
+                  </p>
+                  <p className="mt-1 text-xs text-gray-500 dark:text-zinc-400">
+                    {t("settings.codeGenerationModelHelp")}
+                  </p>
+                </div>
+                <Select
+                  name="code-generation-model"
+                  value={settings.codeGenerationModel}
+                  onValueChange={(value) =>
+                    handleModelChange(value as CodeGenerationModelSetting)
+                  }
+                >
+                  <SelectTrigger className="w-[260px]">
+                    {settings.codeGenerationModel === AUTO_CODE_GENERATION_MODEL
+                      ? t("settings.autoSelectModel")
+                      : CODE_GENERATION_MODEL_DESCRIPTIONS[
+                          settings.codeGenerationModel as CodeGenerationModel
+                        ]?.name ?? settings.codeGenerationModel}
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={AUTO_CODE_GENERATION_MODEL}>
+                      {t("settings.autoSelectModel")}
+                    </SelectItem>
+                    {CODE_GENERATION_MODEL_OPTIONS.map((model) => (
+                      <SelectItem key={model.value} value={model.value}>
+                        {model.name}
+                        {model.inBeta ? ` (${t("common.beta")})` : ""}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+
           {/* Image Generation */}
           <div className="rounded-lg border border-gray-200 bg-white dark:border-zinc-700 dark:bg-zinc-800/60">
             <div className="border-b border-gray-100 px-4 py-3 dark:border-zinc-700">
               <h2 className="text-sm font-medium text-gray-900 dark:text-white">
-                Image Generation
+                {t("settings.imageGeneration")}
               </h2>
             </div>
             <div className="p-4">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-700 dark:text-zinc-300">
-                    Placeholder Images
+                    {t("settings.placeholderImages")}
                   </p>
                   <p className="mt-1 text-xs text-gray-500 dark:text-zinc-400">
-                    More fun with it but if you want to save money, turn it off.
+                    {t("settings.placeholderImagesHelp")}
                   </p>
                 </div>
                 <Switch
@@ -238,25 +343,24 @@ function SettingsTab({ settings, setSettings, appTheme, setAppTheme }: Props) {
           <div className="rounded-lg border border-gray-200 bg-white dark:border-zinc-700 dark:bg-zinc-800/60">
             <div className="border-b border-gray-100 px-4 py-3 dark:border-zinc-700">
               <h2 className="text-sm font-medium text-gray-900 dark:text-white">
-                Screenshot by URL
+                {t("settings.screenshotByUrl")}
               </h2>
             </div>
             <div className="p-4">
               <p className="text-xs text-gray-500 dark:text-zinc-400">
-                If you want to use URLs directly instead of taking the screenshot
-                yourself, add a ScreenshotOne API key.{" "}
+                {t("settings.screenshotByUrlHelp")}{" "}
                 <a
                   href="https://screenshotone.com?via=screenshot-to-code"
                   className="text-violet-600 hover:text-violet-700 dark:text-violet-400 dark:hover:text-violet-300"
                   target="_blank"
                 >
-                  Get 100 screenshots/mo for free.
+                  {t("settings.screenshotOneCta")}
                 </a>
               </p>
               <Input
                 id="screenshot-one-api-key"
                 className="mt-3"
-                placeholder="ScreenshotOne API key"
+                placeholder={t("settings.screenshotOneApiKey")}
                 value={settings.screenshotOneApiKey || ""}
                 onChange={(e) =>
                   setSettings((s) => ({

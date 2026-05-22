@@ -9,6 +9,9 @@ export default ({ mode }) => {
   process.env = { ...process.env, ...loadEnv(mode, process.cwd()) };
   return defineConfig({
     base: "",
+    server: {
+      port: 5174,
+    },
     plugins: [
       react(),
       checker({ 

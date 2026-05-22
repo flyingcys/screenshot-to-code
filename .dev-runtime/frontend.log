@@ -1,0 +1,378 @@
+yarn run v1.22.22
+$ vite --host 0.0.0.0 --port 5173
+
+  VITE v4.5.14  ready in 420 ms
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: http://192.168.3.5:5173/
+  ➜  Network: http://172.18.0.1:5173/
+
+[TypeScript] Found 0 errors. Watching for file changes.
+
+[TypeScript] Found 0 errors. Watching for file changes.
+
+[TypeScript] Found 0 errors. Watching for file changes.
+
+[TypeScript] Found 0 errors. Watching for file changes.
+
+> screenshot-to-code@0.0.0 dev
+> vite --host 0.0.0.0 --port 8090
+
+
+  VITE v4.5.14  ready in 224 ms
+
+  ➜  Local:   http://localhost:8090/
+  ➜  Network: http://192.168.3.5:8090/
+  ➜  Network: http://172.18.0.1:8090/
+
+[TypeScript] Found 0 errors. Watching for file changes.
+
+> screenshot-to-code@0.0.0 dev
+> vite --host 0.0.0.0 --port 8090
+
+
+  VITE v4.5.14  ready in 367 ms
+
+  ➜  Local:   http://localhost:8090/
+  ➜  Network: http://192.168.3.5:8090/
+  ➜  Network: http://172.18.0.1:8090/
+
+> screenshot-to-code@0.0.0 dev
+> vite --host 0.0.0.0 --port 8090
+
+
+  VITE v4.5.14  ready in 261 ms
+
+  ➜  Local:   http://localhost:8090/
+  ➜  Network: http://192.168.3.5:8090/
+  ➜  Network: http://172.18.0.1:8090/
+
+[TypeScript] Found 0 errors. Watching for file changes.
+4:08:26 PM [vite] hmr update /src/App.tsx, /src/index.css, /src/components/messages/PicoBadge.tsx, /src/components/messages/OnboardingNote.tsx, /src/components/TermsOfServiceDialog.tsx, /src/components/sidebar/IconStrip.tsx, /src/components/preview/PreviewPane.tsx, /src/components/history/HistoryDisplay.tsx, /src/components/sidebar/Sidebar.tsx, /src/components/settings/SettingsTab.tsx, /src/components/preview/CodeTab.tsx, /src/components/variants/Variants.tsx, /src/components/preview/PreviewComponent.tsx, /src/components/unified-input/UnifiedInputPane.tsx, /src/components/UpdateImageUpload.tsx, /src/components/agent/AgentActivity.tsx, /src/components/unified-input/tabs/TextTab.tsx, /src/components/unified-input/tabs/UrlTab.tsx, /src/components/unified-input/tabs/ImportTab.tsx, /src/components/unified-input/tabs/UploadTab.tsx, /src/components/settings/OutputSettingsSection.tsx, /src/components/recording/ScreenRecorder.tsx
+
+[TypeScript] Found 0 errors. Watching for file changes.
+4:08:40 PM [vite] hmr update /src/components/evals/EvalNavigation.tsx, /src/index.css
+
+[TypeScript] Found 0 errors. Watching for file changes.
+4:09:21 PM [vite] hmr update /src/components/evals/InputFileSelector.tsx, /src/index.css
+
+[TypeScript] Found 0 errors. Watching for file changes.
+
+[TypeScript] Found 0 errors. Watching for file changes.
+4:09:43 PM [vite] hmr update /src/components/evals/AllEvalsPage.tsx, /src/index.css
+4:09:54 PM [vite] hmr update /src/components/evals/EvalsPage.tsx, /src/index.css
+
+ WARN  4:09:55 PM [vite] warning: Duplicate "placeholder" attribute in JSX element
+164|              onChange={(e) => setFolderPath(e.target.value)}
+165|              placeholder="Enter folder name in Downloads"
+166|              placeholder={t("evals.pairwise.inputPlaceholder")}
+   |              ^
+167|              className="w-full px-4 py-2 rounded text-black" />
+168|            
+
+  Plugin: vite:esbuild
+  File: /Users/cys/ai-coding/screenshot-to-code/frontend/src/components/evals/EvalsPage.tsx
+
+
+ ERROR 
+ ERROR(TypeScript)  JSX elements cannot have multiple attributes with the same name.
+ FILE  /Users/cys/ai-coding/screenshot-to-code/frontend/src/components/evals/EvalsPage.tsx:147:13
+
+  [0m [90m 145 |[39m             onChange[33m=[39m{(e) [33m=>[39m setFolderPath(e[33m.[39mtarget[33m.[39mvalue)}
+   [90m 146 |[39m             placeholder[33m=[39m[32m"Enter folder name in Downloads"[39m
+  [31m[1m>[22m[39m[90m 147 |[39m             placeholder[33m=[39m{t([32m"evals.pairwise.inputPlaceholder"[39m)}
+   [90m     |[39m             [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 148 |[39m             className[33m=[39m[32m"w-full px-4 py-2 rounded text-black"[39m
+   [90m 149 |[39m           [33m/[39m[33m>[39m
+   [90m 150 |[39m           [33m<[39m[33mbutton[39m[0m
+
+[TypeScript] Found 1 error. Watching for file changes.
+
+4:10:20 PM [vite] hmr update /src/components/evals/EvalsPage.tsx, /src/index.css
+
+[TypeScript] Found 0 errors. Watching for file changes.
+4:10:48 PM [vite] hmr update /src/components/evals/RunEvalsPage.tsx, /src/index.css
+
+[TypeScript] Found 0 errors. Watching for file changes.
+4:11:04 PM [vite] hmr update /src/components/evals/RunEvalsPage.tsx, /src/index.css
+
+[TypeScript] Found 0 errors. Watching for file changes.
+4:12:07 PM [vite] hmr update /src/components/evals/RunEvalsPage.tsx, /src/index.css
+
+[TypeScript] Found 0 errors. Watching for file changes.
+4:12:41 PM [vite] hmr update /src/components/evals/OpenAIInputComparePage.tsx, /src/index.css
+
+[TypeScript] Found 0 errors. Watching for file changes.
+4:12:56 PM [vite] hmr update /src/components/evals/PairwiseEvalsPage.tsx, /src/index.css
+
+[TypeScript] Found 0 errors. Watching for file changes.
+4:14:25 PM [vite] hmr update /src/components/evals/BestOfNEvalsPage.tsx, /src/index.css
+4:14:25 PM [vite] hmr update /src/components/evals/BestOfNEvalsPage.tsx, /src/index.css
+4:15:14 PM [vite] hmr update /src/components/evals/BestOfNEvalsPage.tsx, /src/index.css
+
+[TypeScript] Found 0 errors. Watching for file changes.
+4:15:35 PM [vite] hmr update /src/components/evals/BestOfNEvalsPage.tsx, /src/index.css
+
+[TypeScript] Found 0 errors. Watching for file changes.
+4:16:21 PM [vite] hmr update /src/components/evals/EvalsPage.tsx, /src/index.css
+
+[TypeScript] Found 0 errors. Watching for file changes.
+4:16:35 PM [vite] hmr update /src/components/evals/EvalsPage.tsx, /src/index.css
+
+[TypeScript] Found 0 errors. Watching for file changes.
+4:18:28 PM [vite] hmr update /src/App.tsx, /src/index.css, /src/components/messages/PicoBadge.tsx, /src/components/messages/OnboardingNote.tsx, /src/components/TermsOfServiceDialog.tsx, /src/components/sidebar/IconStrip.tsx, /src/components/preview/PreviewPane.tsx, /src/components/history/HistoryDisplay.tsx, /src/components/sidebar/Sidebar.tsx, /src/components/settings/SettingsTab.tsx, /src/components/preview/CodeTab.tsx, /src/components/variants/Variants.tsx, /src/components/preview/PreviewComponent.tsx, /src/components/unified-input/UnifiedInputPane.tsx, /src/components/UpdateImageUpload.tsx, /src/components/agent/AgentActivity.tsx, /src/components/unified-input/tabs/TextTab.tsx, /src/components/unified-input/tabs/UrlTab.tsx, /src/components/unified-input/tabs/ImportTab.tsx, /src/components/unified-input/tabs/UploadTab.tsx, /src/components/settings/OutputSettingsSection.tsx, /src/components/recording/ScreenRecorder.tsx, /src/components/evals/EvalNavigation.tsx, /src/components/evals/InputFileSelector.tsx, /src/components/evals/AllEvalsPage.tsx, /src/components/evals/EvalsPage.tsx, /src/components/evals/RunEvalsPage.tsx, /src/components/evals/OpenAIInputComparePage.tsx, /src/components/evals/PairwiseEvalsPage.tsx, /src/components/evals/BestOfNEvalsPage.tsx
+
+[TypeScript] Found 0 errors. Watching for file changes.
+4:18:46 PM [vite] hmr update /src/components/evals/OpenAIInputComparePage.tsx, /src/index.css
+4:18:46 PM [vite] hmr update /src/components/evals/OpenAIInputComparePage.tsx, /src/index.css
+4:19:40 PM [vite] page reload src/components/core/Spinner.tsx
+
+[TypeScript] Found 0 errors. Watching for file changes.
+4:19:55 PM [vite] hmr update /src/components/ui/dialog.tsx, /src/index.css
+
+[TypeScript] Found 0 errors. Watching for file changes.
+4:21:38 PM [vite] hmr update /src/App.tsx, /src/index.css, /src/components/messages/PicoBadge.tsx, /src/components/messages/OnboardingNote.tsx, /src/components/TermsOfServiceDialog.tsx, /src/components/sidebar/IconStrip.tsx, /src/components/preview/PreviewPane.tsx, /src/components/history/HistoryDisplay.tsx, /src/components/sidebar/Sidebar.tsx, /src/components/settings/SettingsTab.tsx, /src/components/preview/CodeTab.tsx, /src/components/variants/Variants.tsx, /src/components/preview/PreviewComponent.tsx, /src/components/unified-input/UnifiedInputPane.tsx, /src/components/UpdateImageUpload.tsx, /src/components/agent/AgentActivity.tsx, /src/components/unified-input/tabs/TextTab.tsx, /src/components/unified-input/tabs/UrlTab.tsx, /src/components/unified-input/tabs/ImportTab.tsx, /src/components/unified-input/tabs/UploadTab.tsx, /src/components/settings/OutputSettingsSection.tsx, /src/components/recording/ScreenRecorder.tsx, /src/components/evals/EvalNavigation.tsx, /src/components/evals/InputFileSelector.tsx, /src/components/evals/AllEvalsPage.tsx, /src/components/evals/EvalsPage.tsx, /src/components/evals/RunEvalsPage.tsx, /src/components/evals/OpenAIInputComparePage.tsx, /src/components/evals/PairwiseEvalsPage.tsx, /src/components/evals/BestOfNEvalsPage.tsx
+
+[TypeScript] Found 0 errors. Watching for file changes.
+4:21:57 PM [vite] hmr update /src/components/evals/RunEvalsPage.tsx, /src/index.css
+
+[TypeScript] Found 0 errors. Watching for file changes.
+4:23:08 PM [vite] hmr update /src/components/evals/PairwiseEvalsPage.tsx, /src/index.css
+
+[TypeScript] Found 0 errors. Watching for file changes.
+4:23:24 PM [vite] hmr update /src/components/evals/BestOfNEvalsPage.tsx, /src/index.css
+4:23:24 PM [vite] hmr update /src/components/evals/BestOfNEvalsPage.tsx, /src/index.css
+4:25:30 PM [vite] hmr update /src/App.tsx, /src/index.css, /src/components/messages/PicoBadge.tsx, /src/components/messages/OnboardingNote.tsx, /src/components/TermsOfServiceDialog.tsx, /src/components/sidebar/IconStrip.tsx, /src/components/preview/PreviewPane.tsx, /src/components/history/HistoryDisplay.tsx, /src/components/sidebar/Sidebar.tsx, /src/components/settings/SettingsTab.tsx, /src/components/preview/CodeTab.tsx, /src/components/variants/Variants.tsx, /src/components/preview/PreviewComponent.tsx, /src/components/unified-input/UnifiedInputPane.tsx, /src/components/UpdateImageUpload.tsx, /src/components/agent/AgentActivity.tsx, /src/components/unified-input/tabs/TextTab.tsx, /src/components/unified-input/tabs/UrlTab.tsx, /src/components/unified-input/tabs/ImportTab.tsx, /src/components/unified-input/tabs/UploadTab.tsx, /src/components/settings/OutputSettingsSection.tsx, /src/components/recording/ScreenRecorder.tsx, /src/components/evals/EvalNavigation.tsx, /src/components/evals/InputFileSelector.tsx, /src/components/evals/AllEvalsPage.tsx, /src/components/evals/EvalsPage.tsx, /src/components/evals/RunEvalsPage.tsx, /src/components/evals/OpenAIInputComparePage.tsx, /src/components/evals/PairwiseEvalsPage.tsx, /src/components/evals/BestOfNEvalsPage.tsx
+
+[TypeScript] Found 0 errors. Watching for file changes.
+4:25:46 PM [vite] hmr update /src/components/ImageLightbox.tsx, /src/index.css
+
+[TypeScript] Found 0 errors. Watching for file changes.
+4:26:23 PM [vite] hmr update /src/components/variants/Variants.tsx, /src/index.css
+
+[TypeScript] Found 0 errors. Watching for file changes.
+4:27:19 PM [vite] hmr update /src/App.tsx, /src/index.css, /src/components/messages/PicoBadge.tsx, /src/components/messages/OnboardingNote.tsx, /src/components/TermsOfServiceDialog.tsx, /src/components/sidebar/IconStrip.tsx, /src/components/preview/PreviewPane.tsx, /src/components/history/HistoryDisplay.tsx, /src/components/sidebar/Sidebar.tsx, /src/components/settings/SettingsTab.tsx, /src/components/preview/CodeTab.tsx, /src/components/variants/Variants.tsx, /src/components/preview/PreviewComponent.tsx, /src/components/unified-input/UnifiedInputPane.tsx, /src/components/UpdateImageUpload.tsx, /src/components/agent/AgentActivity.tsx, /src/components/unified-input/tabs/TextTab.tsx, /src/components/unified-input/tabs/UrlTab.tsx, /src/components/unified-input/tabs/ImportTab.tsx, /src/components/unified-input/tabs/UploadTab.tsx, /src/components/settings/OutputSettingsSection.tsx, /src/components/recording/ScreenRecorder.tsx, /src/components/evals/EvalNavigation.tsx, /src/components/evals/InputFileSelector.tsx, /src/components/evals/AllEvalsPage.tsx, /src/components/evals/EvalsPage.tsx, /src/components/evals/RunEvalsPage.tsx, /src/components/evals/OpenAIInputComparePage.tsx, /src/components/evals/PairwiseEvalsPage.tsx, /src/components/evals/BestOfNEvalsPage.tsx, /src/components/ImageLightbox.tsx
+
+[TypeScript] Found 0 errors. Watching for file changes.
+4:27:35 PM [vite] hmr update /src/components/evals/BestOfNEvalsPage.tsx, /src/index.css
+
+[TypeScript] Found 0 errors. Watching for file changes.
+4:32:26 PM [vite] hmr update /src/components/evals/BestOfNEvalsPage.tsx, /src/index.css
+
+ ERROR 
+ ERROR(TypeScript)  Block-scoped variable 'handleVote' used before its declaration.
+ FILE  /Users/cys/ai-coding/screenshot-to-code/frontend/src/components/evals/BestOfNEvalsPage.tsx:243:89
+
+  [0m [90m 241 |[39m     window[33m.[39maddEventListener([32m"keydown"[39m[33m,[39m handleKeyPress)[33m;[39m
+   [90m 242 |[39m     [36mreturn[39m () [33m=>[39m window[33m.[39mremoveEventListener([32m"keydown"[39m[33m,[39m handleKeyPress)[33m;[39m
+  [31m[1m>[22m[39m[90m 243 |[39m   }[33m,[39m [currentComparisonIndex[33m,[39m evals[33m.[39mlength[33m,[39m folderNames[33m.[39mlength[33m,[39m goToNext[33m,[39m goToPrevious[33m,[39m handleVote])[33m;[39m
+   [90m     |[39m                                                                                         [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 244 |[39m
+   [90m 245 |[39m   [90m// Add/remove folder input fields[39m
+   [90m 246 |[39m   [36mconst[39m addFolderInput [33m=[39m () [33m=>[39m {[0m
+
+ ERROR(TypeScript)  Variable 'handleVote' is used before being assigned.
+ FILE  /Users/cys/ai-coding/screenshot-to-code/frontend/src/components/evals/BestOfNEvalsPage.tsx:243:89
+
+  [0m [90m 241 |[39m     window[33m.[39maddEventListener([32m"keydown"[39m[33m,[39m handleKeyPress)[33m;[39m
+   [90m 242 |[39m     [36mreturn[39m () [33m=>[39m window[33m.[39mremoveEventListener([32m"keydown"[39m[33m,[39m handleKeyPress)[33m;[39m
+  [31m[1m>[22m[39m[90m 243 |[39m   }[33m,[39m [currentComparisonIndex[33m,[39m evals[33m.[39mlength[33m,[39m folderNames[33m.[39mlength[33m,[39m goToNext[33m,[39m goToPrevious[33m,[39m handleVote])[33m;[39m
+   [90m     |[39m                                                                                         [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 244 |[39m
+   [90m 245 |[39m   [90m// Add/remove folder input fields[39m
+   [90m 246 |[39m   [36mconst[39m addFolderInput [33m=[39m () [33m=>[39m {[0m
+
+[TypeScript] Found 2 errors. Watching for file changes.
+
+4:32:40 PM [vite] hmr update /src/components/evals/BestOfNEvalsPage.tsx, /src/index.css
+
+ ERROR  4:32:40 PM [vite] Internal server error: /Users/cys/ai-coding/screenshot-to-code/frontend/src/components/evals/BestOfNEvalsPage.tsx: Identifier 'handleVote' has already been declared. (319:8)
+
+  317 |   };
+  318 |
+> 319 |   const handleVote = useCallback((index: number, outcome: Outcome) => {
+      |         ^
+  320 |     const newOutcomes = [...outcomes];
+  321 |     newOutcomes[index] = outcome;
+  322 |     setOutcomes(newOutcomes);
+  Plugin: vite:react-babel
+  File: /Users/cys/ai-coding/screenshot-to-code/frontend/src/components/evals/BestOfNEvalsPage.tsx:319:8
+  317|    };
+  318|  
+  319|    const handleVote = useCallback((index: number, outcome: Outcome) => {
+     |          ^
+  320|      const newOutcomes = [...outcomes];
+  321|      newOutcomes[index] = outcome;
+      at constructor (/Users/cys/ai-coding/screenshot-to-code/frontend/node_modules/.pnpm/@babel+parser@7.29.3/node_modules/@babel/parser/lib/index.js:365:19)
+      at TypeScriptParserMixin.raise (/Users/cys/ai-coding/screenshot-to-code/frontend/node_modules/.pnpm/@babel+parser@7.29.3/node_modules/@babel/parser/lib/index.js:6616:19)
+      at TypeScriptScopeHandler.checkRedeclarationInScope (/Users/cys/ai-coding/screenshot-to-code/frontend/node_modules/.pnpm/@babel+parser@7.29.3/node_modules/@babel/parser/lib/index.js:1619:19)
+      at TypeScriptScopeHandler.declareName (/Users/cys/ai-coding/screenshot-to-code/frontend/node_modules/.pnpm/@babel+parser@7.29.3/node_modules/@babel/parser/lib/index.js:1585:12)
+      at TypeScriptScopeHandler.declareName (/Users/cys/ai-coding/screenshot-to-code/frontend/node_modules/.pnpm/@babel+parser@7.29.3/node_modules/@babel/parser/lib/index.js:4892:11)
+      at TypeScriptParserMixin.declareNameFromIdentifier (/Users/cys/ai-coding/screenshot-to-code/frontend/node_modules/.pnpm/@babel+parser@7.29.3/node_modules/@babel/parser/lib/index.js:7584:16)
+      at TypeScriptParserMixin.checkIdentifier (/Users/cys/ai-coding/screenshot-to-code/frontend/node_modules/.pnpm/@babel+parser@7.29.3/node_modules/@babel/parser/lib/index.js:7580:12)
+      at TypeScriptParserMixin.checkLVal (/Users/cys/ai-coding/screenshot-to-code/frontend/node_modules/.pnpm/@babel+parser@7.29.3/node_modules/@babel/parser/lib/index.js:7517:12)
+      at TypeScriptParserMixin.parseVarId (/Users/cys/ai-coding/screenshot-to-code/frontend/node_modules/.pnpm/@babel+parser@7.29.3/node_modules/@babel/parser/lib/index.js:13429:10)
+      at TypeScriptParserMixin.parseVarId (/Users/cys/ai-coding/screenshot-to-code/frontend/node_modules/.pnpm/@babel+parser@7.29.3/node_modules/@babel/parser/lib/index.js:9769:11)
+      at TypeScriptParserMixin.parseVar (/Users/cys/ai-coding/screenshot-to-code/frontend/node_modules/.pnpm/@babel+parser@7.29.3/node_modules/@babel/parser/lib/index.js:13400:12)
+      at TypeScriptParserMixin.parseVarStatement (/Users/cys/ai-coding/screenshot-to-code/frontend/node_modules/.pnpm/@babel+parser@7.29.3/node_modules/@babel/parser/lib/index.js:13247:10)
+      at TypeScriptParserMixin.parseVarStatement (/Users/cys/ai-coding/screenshot-to-code/frontend/node_modules/.pnpm/@babel+parser@7.29.3/node_modules/@babel/parser/lib/index.js:9425:31)
+      at TypeScriptParserMixin.parseStatementContent (/Users/cys/ai-coding/screenshot-to-code/frontend/node_modules/.pnpm/@babel+parser@7.29.3/node_modules/@babel/parser/lib/index.js:12868:23)
+      at TypeScriptParserMixin.parseStatementContent (/Users/cys/ai-coding/screenshot-to-code/frontend/node_modules/.pnpm/@babel+parser@7.29.3/node_modules/@babel/parser/lib/index.js:9525:18)
+      at TypeScriptParserMixin.parseStatementLike (/Users/cys/ai-coding/screenshot-to-code/frontend/node_modules/.pnpm/@babel+parser@7.29.3/node_modules/@babel/parser/lib/index.js:12784:17)
+      at TypeScriptParserMixin.parseStatementListItem (/Users/cys/ai-coding/screenshot-to-code/frontend/node_modules/.pnpm/@babel+parser@7.29.3/node_modules/@babel/parser/lib/index.js:12764:17)
+      at TypeScriptParserMixin.parseBlockOrModuleBlockBody (/Users/cys/ai-coding/screenshot-to-code/frontend/node_modules/.pnpm/@babel+parser@7.29.3/node_modules/@babel/parser/lib/index.js:13333:61)
+      at TypeScriptParserMixin.parseBlockBody (/Users/cys/ai-coding/screenshot-to-code/frontend/node_modules/.pnpm/@babel+parser@7.29.3/node_modules/@babel/parser/lib/index.js:13326:10)
+      at TypeScriptParserMixin.parseBlock (/Users/cys/ai-coding/screenshot-to-code/frontend/node_modules/.pnpm/@babel+parser@7.29.3/node_modules/@babel/parser/lib/index.js:13314:10)
+      at TypeScriptParserMixin.parseFunctionBody (/Users/cys/ai-coding/screenshot-to-code/frontend/node_modules/.pnpm/@babel+parser@7.29.3/node_modules/@babel/parser/lib/index.js:12117:24)
+      at TypeScriptParserMixin.parseFunctionBodyAndFinish (/Users/cys/ai-coding/screenshot-to-code/frontend/node_modules/.pnpm/@babel+parser@7.29.3/node_modules/@babel/parser/lib/index.js:12103:10)
+      at TypeScriptParserMixin.parseFunctionBodyAndFinish (/Users/cys/ai-coding/screenshot-to-code/frontend/node_modules/.pnpm/@babel+parser@7.29.3/node_modules/@babel/parser/lib/index.js:9189:18)
+      at /Users/cys/ai-coding/screenshot-to-code/frontend/node_modules/.pnpm/@babel+parser@7.29.3/node_modules/@babel/parser/lib/index.js:13462:12
+      at TypeScriptParserMixin.withSmartMixTopicForbiddingContext (/Users/cys/ai-coding/screenshot-to-code/frontend/node_modules/.pnpm/@babel+parser@7.29.3/node_modules/@babel/parser/lib/index.js:12420:14)
+      at TypeScriptParserMixin.parseFunction (/Users/cys/ai-coding/screenshot-to-code/frontend/node_modules/.pnpm/@babel+parser@7.29.3/node_modules/@babel/parser/lib/index.js:13461:10)
+      at TypeScriptParserMixin.parseFunctionStatement (/Users/cys/ai-coding/screenshot-to-code/frontend/node_modules/.pnpm/@babel+parser@7.29.3/node_modules/@babel/parser/lib/index.js:13142:17)
+      at TypeScriptParserMixin.parseStatementContent (/Users/cys/ai-coding/screenshot-to-code/frontend/node_modules/.pnpm/@babel+parser@7.29.3/node_modules/@babel/parser/lib/index.js:12808:21)
+      at TypeScriptParserMixin.parseStatementContent (/Users/cys/ai-coding/screenshot-to-code/frontend/node_modules/.pnpm/@babel+parser@7.29.3/node_modules/@babel/parser/lib/index.js:9525:18)
+      at TypeScriptParserMixin.parseStatementLike (/Users/cys/ai-coding/screenshot-to-code/frontend/node_modules/.pnpm/@babel+parser@7.29.3/node_modules/@babel/parser/lib/index.js:12784:17)
+      at TypeScriptParserMixin.parseModuleItem (/Users/cys/ai-coding/screenshot-to-code/frontend/node_modules/.pnpm/@babel+parser@7.29.3/node_modules/@babel/parser/lib/index.js:12761:17)
+      at TypeScriptParserMixin.parseBlockOrModuleBlockBody (/Users/cys/ai-coding/screenshot-to-code/frontend/node_modules/.pnpm/@babel+parser@7.29.3/node_modules/@babel/parser/lib/index.js:13333:36)
+      at TypeScriptParserMixin.parseBlockBody (/Users/cys/ai-coding/screenshot-to-code/frontend/node_modules/.pnpm/@babel+parser@7.29.3/node_modules/@babel/parser/lib/index.js:13326:10)
+      at TypeScriptParserMixin.parseProgram (/Users/cys/ai-coding/screenshot-to-code/frontend/node_modules/.pnpm/@babel+parser@7.29.3/node_modules/@babel/parser/lib/index.js:12639:10)
+      at TypeScriptParserMixin.parseTopLevel (/Users/cys/ai-coding/screenshot-to-code/frontend/node_modules/.pnpm/@babel+parser@7.29.3/node_modules/@babel/parser/lib/index.js:12629:25)
+      at TypeScriptParserMixin.parse (/Users/cys/ai-coding/screenshot-to-code/frontend/node_modules/.pnpm/@babel+parser@7.29.3/node_modules/@babel/parser/lib/index.js:14505:25)
+      at TypeScriptParserMixin.parse (/Users/cys/ai-coding/screenshot-to-code/frontend/node_modules/.pnpm/@babel+parser@7.29.3/node_modules/@babel/parser/lib/index.js:10143:18)
+      at parse (/Users/cys/ai-coding/screenshot-to-code/frontend/node_modules/.pnpm/@babel+parser@7.29.3/node_modules/@babel/parser/lib/index.js:14539:38)
+      at parser (/Users/cys/ai-coding/screenshot-to-code/frontend/node_modules/.pnpm/@babel+core@7.29.0/node_modules/@babel/core/lib/parser/index.js:41:34)
+      at parser.next (<anonymous>)
+      at normalizeFile (/Users/cys/ai-coding/screenshot-to-code/frontend/node_modules/.pnpm/@babel+core@7.29.0/node_modules/@babel/core/lib/transformation/normalize-file.js:64:37)
+      at normalizeFile.next (<anonymous>)
+      at run (/Users/cys/ai-coding/screenshot-to-code/frontend/node_modules/.pnpm/@babel+core@7.29.0/node_modules/@babel/core/lib/transformation/index.js:22:50)
+      at run.next (<anonymous>)
+      at transform (/Users/cys/ai-coding/screenshot-to-code/frontend/node_modules/.pnpm/@babel+core@7.29.0/node_modules/@babel/core/lib/transform.js:22:33)
+      at transform.next (<anonymous>)
+      at step (/Users/cys/ai-coding/screenshot-to-code/frontend/node_modules/.pnpm/gensync@1.0.0-beta.2/node_modules/gensync/index.js:261:32)
+      at /Users/cys/ai-coding/screenshot-to-code/frontend/node_modules/.pnpm/gensync@1.0.0-beta.2/node_modules/gensync/index.js:273:13
+      at async.call.result.err.err (/Users/cys/ai-coding/screenshot-to-code/frontend/node_modules/.pnpm/gensync@1.0.0-beta.2/node_modules/gensync/index.js:223:11)
+      at /Users/cys/ai-coding/screenshot-to-code/frontend/node_modules/.pnpm/gensync@1.0.0-beta.2/node_modules/gensync/index.js:189:28
+
+
+ ERROR 
+ ERROR(TypeScript)  Cannot redeclare block-scoped variable 'handleVote'.
+ FILE  /Users/cys/ai-coding/screenshot-to-code/frontend/src/components/evals/BestOfNEvalsPage.tsx:168:9
+
+  [0m [90m 166 |[39m   }[33m,[39m [winnerFilter[33m,[39m filteredIndices[33m,[39m currentComparisonIndex[33m,[39m evals[33m.[39mlength])[33m;[39m
+   [90m 167 |[39m
+  [31m[1m>[22m[39m[90m 168 |[39m   [36mconst[39m handleVote [33m=[39m useCallback((index[33m:[39m number[33m,[39m outcome[33m:[39m [33mOutcome[39m) [33m=>[39m {
+   [90m     |[39m         [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 169 |[39m     [36mconst[39m newOutcomes [33m=[39m [[33m...[39moutcomes][33m;[39m
+   [90m 170 |[39m     newOutcomes[index] [33m=[39m outcome[33m;[39m
+   [90m 171 |[39m     setOutcomes(newOutcomes)[33m;[39m[0m
+
+ ERROR(TypeScript)  Cannot redeclare block-scoped variable 'handleVote'.
+ FILE  /Users/cys/ai-coding/screenshot-to-code/frontend/src/components/evals/BestOfNEvalsPage.tsx:319:9
+
+  [0m [90m 317 |[39m   }[33m;[39m
+   [90m 318 |[39m
+  [31m[1m>[22m[39m[90m 319 |[39m   [36mconst[39m handleVote [33m=[39m useCallback((index[33m:[39m number[33m,[39m outcome[33m:[39m [33mOutcome[39m) [33m=>[39m {
+   [90m     |[39m         [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 320 |[39m     [36mconst[39m newOutcomes [33m=[39m [[33m...[39moutcomes][33m;[39m
+   [90m 321 |[39m     newOutcomes[index] [33m=[39m outcome[33m;[39m
+   [90m 322 |[39m     setOutcomes(newOutcomes)[33m;[39m[0m
+
+[TypeScript] Found 2 errors. Watching for file changes.
+
+4:33:01 PM [vite] hmr update /src/components/evals/BestOfNEvalsPage.tsx, /src/index.css
+
+[TypeScript] Found 0 errors. Watching for file changes.
+
+> screenshot-to-code@0.0.0 dev
+> vite --host 0.0.0.0 --port 8090
+
+
+  VITE v4.5.14  ready in 299 ms
+
+  ➜  Local:   http://localhost:8090/
+  ➜  Network: http://192.168.3.5:8090/
+  ➜  Network: http://172.18.0.1:8090/
+
+[TypeScript] Found 0 errors. Watching for file changes.
+
+> screenshot-to-code@0.0.0 dev
+> vite --host 0.0.0.0 --port 8090
+
+
+  VITE v4.5.14  ready in 253 ms
+
+  ➜  Local:   http://localhost:8090/
+  ➜  Network: http://192.168.3.5:8090/
+  ➜  Network: http://172.18.0.1:8090/
+
+> screenshot-to-code@0.0.0 dev
+> vite --host 0.0.0.0 --port 8090
+
+
+  VITE v4.5.14  ready in 454 ms
+
+  ➜  Local:   http://localhost:8090/
+  ➜  Network: http://192.168.3.5:8090/
+  ➜  Network: http://172.18.0.1:8090/
+
+[TypeScript] Found 0 errors. Watching for file changes.
+4:42:42 PM [vite] hmr update /src/components/preview/CodeTab.tsx, /src/index.css
+
+[TypeScript] Found 0 errors. Watching for file changes.
+5:27:16 PM [vite] page reload src/lib/settings.test.ts
+
+[TypeScript] Found 0 errors. Watching for file changes.
+5:27:46 PM [vite] hmr update /src/App.tsx, /src/index.css, /src/components/settings/SettingsTab.tsx
+
+[TypeScript] Found 0 errors. Watching for file changes.
+5:27:57 PM [vite] hmr update /src/components/sidebar/Sidebar.tsx, /src/index.css, /src/App.tsx, /src/components/settings/SettingsTab.tsx, /src/components/variants/Variants.tsx
+
+[TypeScript] Found 0 errors. Watching for file changes.
+5:28:17 PM [vite] hmr update /src/components/settings/SettingsTab.tsx, /src/index.css
+
+ ERROR 
+ ERROR(TypeScript)  Argument of type '"settings.codeGeneration"' is not assignable to parameter of type '"settings.appTheme" | "settings.title" | "settings.theme" | "settings.appThemeHelp" | "settings.codeEditorTheme" | "settings.codeEditorThemeHelp" | "settings.uiLanguage" | ... 416 more ... | "importTab.importing"'.
+ FILE  /Users/cys/ai-coding/screenshot-to-code/frontend/src/components/settings/SettingsTab.tsx:261:20
+
+  [0m [90m 259 |[39m             [33m<[39m[33mdiv[39m className[33m=[39m[32m"border-b border-gray-100 px-4 py-3 dark:border-zinc-700"[39m[33m>[39m
+   [90m 260 |[39m               [33m<[39m[33mh2[39m className[33m=[39m[32m"text-sm font-medium text-gray-900 dark:text-white"[39m[33m>[39m
+  [31m[1m>[22m[39m[90m 261 |[39m                 {t([32m"settings.codeGeneration"[39m)}
+   [90m     |[39m                    [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 262 |[39m               [33m<[39m[33m/[39m[33mh2[39m[33m>[39m
+   [90m 263 |[39m             [33m<[39m[33m/[39m[33mdiv[39m[33m>[39m
+   [90m 264 |[39m             [33m<[39m[33mdiv[39m className[33m=[39m[32m"p-4"[39m[33m>[39m[0m
+
+ ERROR(TypeScript)  Argument of type '"settings.codeGenerationModel"' is not assignable to parameter of type '"settings.appTheme" | "settings.title" | "settings.theme" | "settings.appThemeHelp" | "settings.codeEditorTheme" | "settings.codeEditorThemeHelp" | "settings.uiLanguage" | ... 416 more ... | "importTab.importing"'.
+ FILE  /Users/cys/ai-coding/screenshot-to-code/frontend/src/components/settings/SettingsTab.tsx:268:24
+
+  [0m [90m 266 |[39m                 [33m<[39m[33mdiv[39m[33m>[39m
+   [90m 267 |[39m                   [33m<[39m[33mp[39m className[33m=[39m[32m"text-sm font-medium text-gray-700 dark:text-zinc-300"[39m[33m>[39m
+  [31m[1m>[22m[39m[90m 268 |[39m                     {t([32m"settings.codeGenerationModel"[39m)}
+   [90m     |[39m                        [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 269 |[39m                   [33m<[39m[33m/[39m[33mp[39m[33m>[39m
+   [90m 270 |[39m                   [33m<[39m[33mp[39m className[33m=[39m[32m"mt-1 text-xs text-gray-500 dark:text-zinc-400"[39m[33m>[39m
+   [90m 271 |[39m                     {t([32m"settings.codeGenerationModelHelp"[39m)}[0m
+
+ ERROR(TypeScript)  Argument of type '"settings.codeGenerationModelHelp"' is not assignable to parameter of type '"settings.appTheme" | "settings.title" | "settings.theme" | "settings.appThemeHelp" | "settings.codeEditorTheme" | "settings.codeEditorThemeHelp" | "settings.uiLanguage" | ... 416 more ... | "importTab.importing"'.
+ FILE  /Users/cys/ai-coding/screenshot-to-code/frontend/src/components/settings/SettingsTab.tsx:271:24
+
+  [0m [90m 269 |[39m                   [33m<[39m[33m/[39m[33mp[39m[33m>[39m
+   [90m 270 |[39m                   [33m<[39m[33mp[39m className[33m=[39m[32m"mt-1 text-xs text-gray-500 dark:text-zinc-400"[39m[33m>[39m
+  [31m[1m>[22m[39m[90m 271 |[39m                     {t([32m"settings.codeGenerationModelHelp"[39m)}
+   [90m     |[39m                        [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 272 |[39m                   [33m<[39m[33m/[39m[33mp[39m[33m>[39m
+   [90m 273 |[39m                 [33m<[39m[33m/[39m[33mdiv[39m[33m>[39m
+   [90m 274 |[39m                 [33m<[39m[33mSelect[39m[0m
+
+[TypeScript] Found 3 errors. Watching for file changes.
+
+5:30:07 PM [vite] hmr update /src/components/evals/PairwiseEvalsPage.tsx, /src/index.css, /src/App.tsx, /src/components/evals/EvalsPage.tsx, /src/components/evals/BestOfNEvalsPage.tsx, /src/components/evals/OpenAIInputComparePage.tsx, /src/components/evals/RunEvalsPage.tsx, /src/components/evals/AllEvalsPage.tsx, /src/components/TermsOfServiceDialog.tsx, /src/components/messages/PicoBadge.tsx, /src/components/messages/OnboardingNote.tsx, /src/components/sidebar/Sidebar.tsx, /src/components/sidebar/IconStrip.tsx, /src/components/settings/SettingsTab.tsx, /src/components/history/HistoryDisplay.tsx, /src/components/evals/EvalNavigation.tsx, /src/components/preview/PreviewPane.tsx, /src/components/evals/InputFileSelector.tsx, /src/components/variants/Variants.tsx, /src/components/UpdateImageUpload.tsx, /src/components/agent/AgentActivity.tsx, /src/components/ImageLightbox.tsx, /src/components/unified-input/UnifiedInputPane.tsx, /src/components/preview/CodeTab.tsx, /src/components/preview/PreviewComponent.tsx, /src/components/unified-input/tabs/UrlTab.tsx, /src/components/unified-input/tabs/TextTab.tsx, /src/components/unified-input/tabs/UploadTab.tsx, /src/components/unified-input/tabs/ImportTab.tsx, /src/components/settings/OutputSettingsSection.tsx, /src/components/recording/ScreenRecorder.tsx
+
+[TypeScript] Found 0 errors. Watching for file changes.
+5:30:27 PM [vite] hmr update /src/components/sidebar/Sidebar.tsx, /src/index.css, /src/App.tsx, /src/components/settings/SettingsTab.tsx, /src/components/variants/Variants.tsx
+
+[TypeScript] Found 0 errors. Watching for file changes.
+5:33:58 PM [vite] page reload src/lib/settings.test.ts
+
+[TypeScript] Found 0 errors. Watching for file changes.

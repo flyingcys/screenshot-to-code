@@ -2,6 +2,7 @@ import { useState } from "react";
 
 import { HTTP_BACKEND_URL } from "../../config";
 import EvalNavigation from "./EvalNavigation";
+import { useI18n } from "../../lib/i18n";
 
 interface OpenAIInputDifference {
   item_index: number;
@@ -26,6 +27,7 @@ function formatJson(value: unknown): string {
 }
 
 function OpenAIInputComparePage() {
+  const { t } = useI18n();
   const [leftJson, setLeftJson] = useState("");
   const [rightJson, setRightJson] = useState("");
   const [result, setResult] = useState<OpenAIInputCompareResponse | null>(null);
@@ -34,7 +36,7 @@ function OpenAIInputComparePage() {
 
   const handleCompare = async () => {
     if (!leftJson.trim() || !rightJson.trim()) {
-      setError("Paste both JSON payloads before comparing.");
+      setError(t("evals.openAiCompare.pasteBoth"));
       return;
     }
 
@@ -56,7 +58,7 @@ function OpenAIInputComparePage() {
       const data = await response.json();
       if (!response.ok) {
         setResult(null);
-        setError(data.detail || "Compare request failed.");
+        setError(data.detail || t("evals.openAiCompare.compareFailed"));
         return;
       }
 
@@ -64,7 +66,7 @@ function OpenAIInputComparePage() {
     } catch (requestError) {
       console.error("Error comparing OpenAI inputs", requestError);
       setResult(null);
-      setError("Compare request failed.");
+      setError(t("evals.openAiCompare.compareFailed"));
     } finally {
       setIsLoading(false);
     }
@@ -76,31 +78,28 @@ function OpenAIInputComparePage() {
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-6">
         <div className="rounded-2xl border border-zinc-800 bg-zinc-900/80 p-6 shadow-2xl shadow-black/20">
           <h1 className="text-3xl font-semibold tracking-tight">
-            OpenAI Input Compare
+            {t("evals.openAiCompare.title")}
           </h1>
           <p className="mt-2 max-w-3xl text-sm leading-6 text-zinc-300">
-            Paste either a full OpenAI request payload or just the raw{" "}
+            {t("evals.openAiCompare.description")}{" "}
             <code className="rounded bg-zinc-800 px-1.5 py-0.5 text-zinc-100">
               input
-            </code>{" "}
-            array on each side. The compare view finds the first input block
-            that diverges and the first nested field path where that happens.
+            </code>
           </p>
           <p className="mt-2 text-sm text-zinc-400">
-            The OpenAI Turn Input Report now has a{" "}
+            {t("evals.openAiCompare.tip")}{" "}
             <span className="rounded bg-zinc-800 px-1.5 py-0.5 text-zinc-100">
-              Copy input JSON
-            </span>{" "}
-            button you can paste here directly.
+              {t("evals.openAiCompare.copyInputJson")}
+            </span>
           </p>
         </div>
 
         <div className="grid gap-6 xl:grid-cols-2">
           <section className="rounded-2xl border border-emerald-900/60 bg-emerald-950/30 p-4">
-            <div className="mb-3 flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-emerald-100">Left JSON</h2>
+              <div className="mb-3 flex items-center justify-between">
+              <h2 className="text-lg font-semibold text-emerald-100">{t("evals.openAiCompare.leftJson")}</h2>
               <span className="text-xs uppercase tracking-[0.18em] text-emerald-300/80">
-                Request A
+                {t("evals.openAiCompare.requestA")}
               </span>
             </div>
             <textarea
@@ -113,10 +112,10 @@ function OpenAIInputComparePage() {
           </section>
 
           <section className="rounded-2xl border border-sky-900/60 bg-sky-950/30 p-4">
-            <div className="mb-3 flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-sky-100">Right JSON</h2>
+              <div className="mb-3 flex items-center justify-between">
+              <h2 className="text-lg font-semibold text-sky-100">{t("evals.openAiCompare.rightJson")}</h2>
               <span className="text-xs uppercase tracking-[0.18em] text-sky-300/80">
-                Request B
+                {t("evals.openAiCompare.requestB")}
               </span>
             </div>
             <textarea
@@ -136,7 +135,7 @@ function OpenAIInputComparePage() {
             disabled={isLoading}
             className="rounded-full bg-white px-5 py-2 text-sm font-semibold text-zinc-950 transition hover:bg-zinc-200 disabled:cursor-not-allowed disabled:bg-zinc-500"
           >
-            {isLoading ? "Comparing..." : "Compare Inputs"}
+            {isLoading ? t("evals.openAiCompare.comparing") : t("evals.openAiCompare.compare")}
           </button>
           {error ? <p className="text-sm text-rose-300">{error}</p> : null}
         </div>
@@ -146,18 +145,16 @@ function OpenAIInputComparePage() {
             <section className="grid gap-4 md:grid-cols-3">
               <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-4">
                 <div className="text-xs uppercase tracking-[0.18em] text-zinc-400">
-                  Shared Prefix
+                  {t("evals.openAiCompare.sharedPrefix")}
                 </div>
                 <div className="mt-2 text-3xl font-semibold">
                   {result.common_prefix_items}
                 </div>
-                <p className="mt-1 text-sm text-zinc-400">
-                  Top-level input items that match exactly before divergence.
-                </p>
+                <p className="mt-1 text-sm text-zinc-400">{t("evals.openAiCompare.sharedPrefixDesc")}</p>
               </div>
               <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-4">
                 <div className="text-xs uppercase tracking-[0.18em] text-zinc-400">
-                  Left Items
+                  {t("evals.openAiCompare.leftItems")}
                 </div>
                 <div className="mt-2 text-3xl font-semibold">
                   {result.left_item_count}
@@ -165,7 +162,7 @@ function OpenAIInputComparePage() {
               </div>
               <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-4">
                 <div className="text-xs uppercase tracking-[0.18em] text-zinc-400">
-                  Right Items
+                  {t("evals.openAiCompare.rightItems")}
                 </div>
                 <div className="mt-2 text-3xl font-semibold">
                   {result.right_item_count}
@@ -174,12 +171,12 @@ function OpenAIInputComparePage() {
             </section>
 
             <section className="rounded-2xl border border-zinc-800 bg-zinc-900 p-5">
-              <h2 className="text-xl font-semibold">First Difference</h2>
+              <h2 className="text-xl font-semibold">{t("evals.openAiCompare.firstDifference")}</h2>
               {result.difference ? (
                 <div className="mt-4 grid gap-4">
                   <div className="rounded-xl border border-amber-900/60 bg-amber-950/30 p-4">
                     <div className="text-xs uppercase tracking-[0.18em] text-amber-300/80">
-                      Path
+                      {t("evals.openAiCompare.path")}
                     </div>
                     <div className="mt-2 font-mono text-sm text-amber-50">
                       {result.difference.path}
@@ -189,13 +186,13 @@ function OpenAIInputComparePage() {
                   <div className="grid gap-4 xl:grid-cols-2">
                     <div className="rounded-xl border border-emerald-900/60 bg-emerald-950/30 p-4">
                       <div className="text-xs uppercase tracking-[0.18em] text-emerald-300/80">
-                        Left Summary
+                        {t("evals.openAiCompare.leftSummary")}
                       </div>
                       <pre className="mt-2 whitespace-pre-wrap break-words rounded-lg bg-zinc-950 p-3 font-mono text-xs text-zinc-100">
                         {result.difference.left_summary}
                       </pre>
                       <div className="mt-3 text-xs uppercase tracking-[0.18em] text-emerald-300/80">
-                        Left Value
+                        {t("evals.openAiCompare.leftValue")}
                       </div>
                       <pre className="mt-2 max-h-[320px] overflow-auto whitespace-pre-wrap break-words rounded-lg bg-zinc-950 p-3 font-mono text-xs text-zinc-100">
                         {formatJson(result.difference.left_value)}
@@ -204,13 +201,13 @@ function OpenAIInputComparePage() {
 
                     <div className="rounded-xl border border-sky-900/60 bg-sky-950/30 p-4">
                       <div className="text-xs uppercase tracking-[0.18em] text-sky-300/80">
-                        Right Summary
+                        {t("evals.openAiCompare.rightSummary")}
                       </div>
                       <pre className="mt-2 whitespace-pre-wrap break-words rounded-lg bg-zinc-950 p-3 font-mono text-xs text-zinc-100">
                         {result.difference.right_summary}
                       </pre>
                       <div className="mt-3 text-xs uppercase tracking-[0.18em] text-sky-300/80">
-                        Right Value
+                        {t("evals.openAiCompare.rightValue")}
                       </div>
                       <pre className="mt-2 max-h-[320px] overflow-auto whitespace-pre-wrap break-words rounded-lg bg-zinc-950 p-3 font-mono text-xs text-zinc-100">
                         {formatJson(result.difference.right_value)}
@@ -219,14 +216,12 @@ function OpenAIInputComparePage() {
                   </div>
                 </div>
               ) : (
-                <p className="mt-4 text-zinc-300">
-                  No difference found. Both inputs match exactly.
-                </p>
+                <p className="mt-4 text-zinc-300">{t("evals.openAiCompare.noDifference")}</p>
               )}
             </section>
 
             <section className="rounded-2xl border border-zinc-800 bg-zinc-900 p-5">
-              <h2 className="text-xl font-semibold">Formatted Summary</h2>
+              <h2 className="text-xl font-semibold">{t("evals.openAiCompare.formattedSummary")}</h2>
               <pre className="mt-4 max-h-[420px] overflow-auto whitespace-pre-wrap break-words rounded-xl bg-zinc-950 p-4 font-mono text-xs text-zinc-100">
                 {result.formatted}
               </pre>

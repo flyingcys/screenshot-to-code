@@ -1,11 +1,12 @@
 import { useProjectStore } from "../../store/project-store";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useThrottle } from "../../hooks/useThrottle";
 import {
   CODE_GENERATION_MODEL_DESCRIPTIONS,
   CodeGenerationModel,
 } from "../../lib/models";
 import WorkingPulse from "../core/WorkingPulse";
+import { useI18n } from "../../lib/i18n";
 
 const IFRAME_WIDTH = 1280;
 const IFRAME_HEIGHT = 550;
@@ -55,7 +56,7 @@ function VariantThumbnail({ code, isSelected }: VariantThumbnailProps) {
     >
       <iframe
         ref={iframeRef}
-        title="variant-preview"
+        title="变体预览"
         className="pointer-events-none origin-top-left"
         style={{
           width: `${IFRAME_WIDTH}px`,
@@ -70,15 +71,16 @@ function VariantThumbnail({ code, isSelected }: VariantThumbnailProps) {
 
 function Variants() {
   const { head, commits, updateSelectedVariantIndex } = useProjectStore();
+  const { t } = useI18n();
 
   const commit = head ? commits[head] : null;
   const variants = commit?.variants || [];
   const selectedVariantIndex = commit?.selectedVariantIndex || 0;
 
-  const handleVariantClick = (index: number) => {
+  const handleVariantClick = useCallback((index: number) => {
     if (index === selectedVariantIndex || !head) return;
     updateSelectedVariantIndex(head, index);
-  };
+  }, [head, selectedVariantIndex, updateSelectedVariantIndex]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -101,7 +103,7 @@ function Variants() {
 
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [variants.length, commit?.isCommitted, selectedVariantIndex, head]);
+  }, [variants.length, commit, handleVariantClick]);
 
   if (head === null || !commit) {
     return null;
@@ -137,7 +139,7 @@ function Variants() {
               <div className="flex items-center px-2 py-1 bg-white dark:bg-zinc-900">
                 <span className="inline-flex min-w-0 items-center text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
                   <span className={`w-2 h-2 rounded-full mr-1.5 ${statusColor}`} />
-                  Option {index + 1}
+                  {t("variants.option")} {index + 1}
                   {index < 9 && (
                     <span className="text-xs text-gray-400 dark:text-gray-500 font-mono ml-1">
                       (⌥{index + 1})
@@ -149,7 +151,7 @@ function Variants() {
                     className="ml-auto shrink-0 inline-flex items-center"
                     role="status"
                     aria-live="polite"
-                    aria-label="Working"
+                    aria-label={t("variants.working")}
                   >
                     <WorkingPulse />
                   </div>

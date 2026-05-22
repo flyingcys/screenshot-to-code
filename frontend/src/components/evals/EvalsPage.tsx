@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { HTTP_BACKEND_URL } from "../../config";
 import RatingPicker from "./RatingPicker";
 import EvalNavigation from "./EvalNavigation";
+import { useI18n } from "../../lib/i18n";
 
 interface Eval {
   input: string;
@@ -21,6 +22,7 @@ interface OutputDisplay {
 }
 
 function EvalsPage() {
+  const { t } = useI18n();
   const [evals, setEvals] = React.useState<Eval[]>([]);
   const [ratings, setRatings] = React.useState<RatingCriteria[]>([]);
   const [folderPath, setFolderPath] = useState("");
@@ -77,7 +79,7 @@ function EvalsPage() {
 
   const loadEvals = async () => {
     if (!folderPath) {
-      alert("Please enter a folder path");
+      alert(t("evals.pairwise.enterPaths"));
       return;
     }
 
@@ -104,7 +106,7 @@ function EvalsPage() {
       );
     } catch (error) {
       console.error("Error loading evals:", error);
-      alert("Error loading evals. Please check the folder path and try again.");
+      alert(t("evals.run.failedRun"));
     } finally {
       setIsLoading(false);
     }
@@ -132,6 +134,14 @@ function EvalsPage() {
     setOutputDisplays(newDisplays);
   };
 
+  const scoreLabelMap: Record<keyof RatingCriteria, string> = {
+    stackAdherence: t("evals.single.stackAdherence"),
+    accuracy: t("evals.single.accuracy"),
+    codeQuality: t("evals.single.codeQuality"),
+    mobileResponsiveness: t("evals.single.mobileResponsiveness"),
+    imageCaptionQuality: t("evals.single.imageCaptionQuality"),
+  };
+
   return (
     <div className="mx-auto">
       <EvalNavigation />
@@ -141,7 +151,7 @@ function EvalsPage() {
             type="text"
             value={folderPath}
             onChange={(e) => setFolderPath(e.target.value)}
-            placeholder="Enter folder name in Downloads"
+            placeholder={t("evals.single.enterFolder")}
             className="w-full px-4 py-2 rounded text-black"
           />
           <button
@@ -149,17 +159,17 @@ function EvalsPage() {
             disabled={isLoading}
             className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded disabled:bg-blue-300"
           >
-            {isLoading ? "Loading..." : "Load Evals"}
+            {isLoading ? t("evals.run.loading") : t("evals.single.loadEvals")}
           </button>
         </div>
 
         {evals.length > 0 && (
           <div className="flex flex-col items-center gap-2 text-lg">
-            <h2 className="text-2xl font-semibold mb-2">Scores by Category</h2>
+            <h2 className="text-2xl font-semibold mb-2">{t("evals.single.scoresByCategory")}</h2>
             {Object.entries(calculateScores()).map(([criterion, score]) => (
               <div key={criterion} className="flex gap-x-4 items-center">
                 <span className="min-w-[200px] text-right capitalize">
-                  {criterion.replace(/([A-Z])/g, " $1").trim()}:
+                  {scoreLabelMap[criterion as keyof RatingCriteria]}:
                 </span>
                 <span>
                   {score.total} / {score.max} ({score.percentage}%)
@@ -173,10 +183,10 @@ function EvalsPage() {
       <div className="flex flex-col gap-y-8 mt-4 mx-auto justify-center">
         {evals.map((e, index) => (
           <div className="flex flex-col justify-center" key={index}>
-            <h2 className="font-bold text-lg ml-4">Evaluation {index + 1}</h2>
+            <h2 className="font-bold text-lg ml-4">{t("evals.single.evaluation").replace("{index}", String(index + 1))}</h2>
             <div className="flex gap-x-2 justify-center ml-4">
               <div className="w-1/2 p-1 border">
-                <img src={e.input} alt={`Input for eval ${index}`} />
+                <img src={e.input} alt={t("evals.single.inputForEval").replace("{index}", String(index + 1))} />
               </div>
               {e.outputs.map((output, outputIndex) => (
                 <div className="w-1/2 p-1 border" key={outputIndex}>
@@ -185,7 +195,7 @@ function EvalsPage() {
                       onClick={() => toggleSourceView(index)}
                       className="bg-gray-500 hover:bg-gray-600 text-white px-2 py-1 rounded text-sm"
                     >
-                      {outputDisplays[index]?.showSource ? "Show Preview" : "Show Source"}
+                      {outputDisplays[index]?.showSource ? t("evals.single.showPreview") : t("evals.single.showSource")}
                     </button>
                   </div>
                   {outputDisplays[index]?.showSource ? (
@@ -205,7 +215,7 @@ function EvalsPage() {
             <div className="ml-8 mt-4 space-y-2">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div className="flex items-center gap-x-4">
-                  <span className="min-w-[160px]">Stack Adherence:</span>
+                  <span className="min-w-[160px]">{scoreLabelMap.stackAdherence}:</span>
                   <RatingPicker
                     onSelect={(rating) =>
                       updateRating(index, "stackAdherence", rating)
@@ -215,7 +225,7 @@ function EvalsPage() {
                   />
                 </div>
                 <div className="flex items-center gap-x-4">
-                  <span className="min-w-[160px]">Accuracy:</span>
+                  <span className="min-w-[160px]">{scoreLabelMap.accuracy}:</span>
                   <RatingPicker
                     onSelect={(rating) =>
                       updateRating(index, "accuracy", rating)
@@ -225,7 +235,7 @@ function EvalsPage() {
                   />
                 </div>
                 <div className="flex items-center gap-x-4">
-                  <span className="min-w-[160px]">Code Quality:</span>
+                  <span className="min-w-[160px]">{scoreLabelMap.codeQuality}:</span>
                   <RatingPicker
                     onSelect={(rating) =>
                       updateRating(index, "codeQuality", rating)
@@ -235,7 +245,7 @@ function EvalsPage() {
                   />
                 </div>
                 <div className="flex items-center gap-x-4">
-                  <span className="min-w-[160px]">Mobile Responsiveness:</span>
+                  <span className="min-w-[160px]">{scoreLabelMap.mobileResponsiveness}:</span>
                   <RatingPicker
                     onSelect={(rating) =>
                       updateRating(index, "mobileResponsiveness", rating)
@@ -245,7 +255,7 @@ function EvalsPage() {
                   />
                 </div>
                 <div className="flex items-center gap-x-4">
-                  <span className="min-w-[160px]">Image Caption Quality:</span>
+                  <span className="min-w-[160px]">{scoreLabelMap.imageCaptionQuality}:</span>
                   <RatingPicker
                     onSelect={(rating) =>
                       updateRating(index, "imageCaptionQuality", rating)

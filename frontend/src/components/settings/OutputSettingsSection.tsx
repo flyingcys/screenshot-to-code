@@ -8,6 +8,7 @@ import {
 } from "../ui/select";
 import { Stack } from "../../lib/stacks";
 import StackLabel from "../core/StackLabel";
+import { useI18n } from "../../lib/i18n";
 
 interface Props {
   stack: Stack | undefined;
@@ -19,13 +20,15 @@ interface Props {
 function OutputSettingsSection({
   stack,
   setStack,
-  label = "Stack:",
+  label,
   shouldDisableUpdates = false,
 }: Props) {
+  const { t } = useI18n();
+
   return (
     <div className="flex flex-col gap-y-2 justify-between text-sm">
       <div className="grid grid-cols-3 items-center gap-4">
-        <span>{label}</span>
+        <span>{label ?? t("common.stack")}</span>
         <Select
           value={stack ?? ""}
           onValueChange={(value: string) => setStack(value as Stack)}
@@ -36,7 +39,7 @@ function OutputSettingsSection({
             id="output-settings-js"
             data-testid="stack-select"
           >
-            <SelectValue placeholder="Select a stack" />
+            <SelectValue placeholder={t("common.selectAStack")} />
           </SelectTrigger>
           <SelectContent>
             <SelectGroup>

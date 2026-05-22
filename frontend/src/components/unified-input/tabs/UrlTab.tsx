@@ -5,6 +5,7 @@ import { Input } from "../../ui/input";
 import { toast } from "react-hot-toast";
 import OutputSettingsSection from "../../settings/OutputSettingsSection";
 import { Stack } from "../../../lib/stacks";
+import { useI18n } from "../../../lib/i18n";
 
 interface Props {
   screenshotOneApiKey: string | null;
@@ -24,33 +25,32 @@ function isFigmaUrl(url: string): boolean {
 function UrlTab({ doCreate, screenshotOneApiKey, stack, setStack }: Props) {
   const [isLoading, setIsLoading] = useState(false);
   const [referenceUrl, setReferenceUrl] = useState("");
+  const { t } = useI18n();
 
   async function takeScreenshot() {
     const trimmedReferenceUrl = referenceUrl.trim();
 
     if (!screenshotOneApiKey) {
       toast.error(
-        "Please add a ScreenshotOne API key in Settings. You can also upload screenshots directly in the Upload tab.",
+        t("urlTab.screenshotOneKeyRequired"),
         { duration: 6000 },
       );
       return;
     }
 
     if (!trimmedReferenceUrl) {
-      toast.error("Please enter a URL");
+      toast.error(t("urlTab.enterUrl"));
       return;
     }
 
     if (trimmedReferenceUrl.toLowerCase().startsWith("file://")) {
-      toast.error(
-        "file:// URLs can't be screenshot. If you're trying to import a local file, please use the Import tab.",
-      );
+      toast.error(t("urlTab.fileUrlsNotSupported"));
       return;
     }
 
     if (isFigmaUrl(trimmedReferenceUrl)) {
       toast.error(
-        "Direct Figma import is not supported. Take a screenshot of your design or export the artboards as images, then use the Upload tab.",
+        t("urlTab.figmaNotSupported"),
         { duration: 6000 },
       );
       return;
@@ -70,14 +70,14 @@ function UrlTab({ doCreate, screenshotOneApiKey, stack, setStack }: Props) {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to capture screenshot");
+        throw new Error(t("urlTab.failedToCapture"));
       }
 
       const res = await response.json();
       doCreate([res.url], "image");
     } catch (error) {
       console.error(error);
-      toast.error("Failed to capture screenshot. Check console for details.");
+      toast.error(t("urlTab.failedToCapture"));
     } finally {
       setIsLoading(false);
     }
@@ -106,7 +106,9 @@ function UrlTab({ doCreate, screenshotOneApiKey, stack, setStack }: Props) {
           </div>
 
           <div className="text-center">
-            <h3 className="text-gray-700 dark:text-zinc-200 font-medium">Screenshot from URL</h3>
+            <h3 className="text-gray-700 dark:text-zinc-200 font-medium">
+              {t("urlTab.screenshotFromUrl")}
+            </h3>
           </div>
 
           <div className="w-full space-y-3">
@@ -123,11 +125,9 @@ function UrlTab({ doCreate, screenshotOneApiKey, stack, setStack }: Props) {
               data-testid="url-input"
             />
             {isFigmaUrl(referenceUrl) && (
-              <p className="text-xs text-amber-600 dark:text-amber-400">
-                Direct Figma import is not supported. Take a screenshot of your
-                design or export the artboards as images, then use the Upload
-                tab.
-              </p>
+                <p className="text-xs text-amber-600 dark:text-amber-400">
+                {t("urlTab.figmaNotSupported")}
+                </p>
             )}
             <OutputSettingsSection stack={stack} setStack={setStack} />
 
@@ -160,16 +160,16 @@ function UrlTab({ doCreate, screenshotOneApiKey, stack, setStack }: Props) {
                       d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                     />
                   </svg>
-                  Capturing...
+                  {t("urlTab.capturing")}
                 </span>
               ) : (
-                "Capture & Generate"
+                t("urlTab.captureAndGenerate")
               )}
             </Button>
           </div>
 
           <p className="text-xs text-gray-400 dark:text-zinc-500 text-center">
-            Requires ScreenshotOne API key.
+            {t("urlTab.requiresKey")}
           </p>
         </div>
       </div>

@@ -13,6 +13,7 @@ import { Textarea } from "./ui/textarea";
 import OutputSettingsSection from "./settings/OutputSettingsSection";
 import toast from "react-hot-toast";
 import { Stack } from "../lib/stacks";
+import { useI18n } from "../lib/i18n";
 
 interface Props {
   importFromCode: (code: string, stack: Stack) => void;
@@ -21,15 +22,16 @@ interface Props {
 function ImportCodeSection({ importFromCode }: Props) {
   const [code, setCode] = useState("");
   const [stack, setStack] = useState<Stack | undefined>(undefined);
+  const { t } = useI18n();
 
   const doImport = () => {
     if (code === "") {
-      toast.error("Please paste in some code");
+      toast.error(t("importCode.pasteSomeCode"));
       return;
     }
 
     if (stack === undefined) {
-      toast.error("Please select your stack");
+      toast.error(t("importCode.selectYourStack"));
       return;
     }
 
@@ -39,14 +41,14 @@ function ImportCodeSection({ importFromCode }: Props) {
     <Dialog>
       <DialogTrigger asChild>
         <Button className="import-from-code-btn" variant="secondary">
-          Import from Code
+          {t("importCode.importFromCode")}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Paste in your HTML code</DialogTitle>
+          <DialogTitle>{t("importCode.pasteHtmlCode")}</DialogTitle>
           <DialogDescription>
-            Make sure that the code you're importing is valid HTML.
+            {t("importCode.validHtml")}
           </DialogDescription>
         </DialogHeader>
 
@@ -59,13 +61,13 @@ function ImportCodeSection({ importFromCode }: Props) {
         <OutputSettingsSection
           stack={stack}
           setStack={(config: Stack) => setStack(config)}
-          label="Stack:"
+          label={t("importCode.stackLabel")}
           shouldDisableUpdates={false}
         />
 
         <DialogFooter>
           <Button className="import-btn" type="submit" onClick={doImport}>
-            Import
+            {t("importCode.import")}
           </Button>
         </DialogFooter>
       </DialogContent>
