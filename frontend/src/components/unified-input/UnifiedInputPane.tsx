@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { Stack } from "../../lib/stacks";
-import { Settings } from "../../types";
+import { DesignSystem, Settings } from "../../types";
 import UploadTab from "./tabs/UploadTab";
 import UrlTab from "./tabs/UrlTab";
 import TextTab from "./tabs/TextTab";
 import ImportTab from "./tabs/ImportTab";
 import { useI18n } from "../../lib/i18n";
+import { DesignSystemSelectorProps } from "../settings/DesignSystemSelector";
 
 interface Props {
   doCreate: (
@@ -18,6 +19,9 @@ interface Props {
   importFromCode: (code: string, stack: Stack) => void;
   settings: Settings;
   setSettings: React.Dispatch<React.SetStateAction<Settings>>;
+  designSystems: DesignSystem[];
+  onAddNewDesignSystem: () => void;
+  onManageDesignSystems: () => void;
 }
 
 type InputTab = "upload" | "url" | "text" | "import";
@@ -28,6 +32,9 @@ function UnifiedInputPane({
   importFromCode,
   settings,
   setSettings,
+  designSystems,
+  onAddNewDesignSystem,
+  onManageDesignSystems,
 }: Props) {
   const [activeTab, setActiveTab] = useState<InputTab>("upload");
   const { t } = useI18n();
@@ -38,6 +45,21 @@ function UnifiedInputPane({
       generatedCodeConfig: stack,
     }));
   }
+
+  function setSelectedDesignSystemId(id: string | null) {
+    setSettings((prev: Settings) => ({
+      ...prev,
+      selectedDesignSystemId: id,
+    }));
+  }
+
+  const designSystemSelectorProps: DesignSystemSelectorProps = {
+    designSystems,
+    selectedDesignSystemId: settings.selectedDesignSystemId,
+    setSelectedDesignSystemId,
+    onAddNew: onAddNewDesignSystem,
+    onManage: onManageDesignSystems,
+  };
 
   return (
     <div className="w-full max-w-4xl mx-auto px-4">
@@ -86,6 +108,7 @@ function UnifiedInputPane({
             doCreate={doCreate}
             stack={settings.generatedCodeConfig}
             setStack={setStack}
+            designSystem={designSystemSelectorProps}
           />
         </TabsContent>
 
@@ -95,6 +118,7 @@ function UnifiedInputPane({
             screenshotOneApiKey={settings.screenshotOneApiKey}
             stack={settings.generatedCodeConfig}
             setStack={setStack}
+            designSystem={designSystemSelectorProps}
           />
         </TabsContent>
 
@@ -103,6 +127,7 @@ function UnifiedInputPane({
             doCreateFromText={doCreateFromText}
             stack={settings.generatedCodeConfig}
             setStack={setStack}
+            designSystem={designSystemSelectorProps}
           />
         </TabsContent>
 

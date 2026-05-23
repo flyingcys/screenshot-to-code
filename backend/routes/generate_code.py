@@ -240,6 +240,7 @@ class ExtractedParams:
     file_state: Dict[str, str] | None
     option_codes: List[str]
     code_generation_model: Llm | None = None
+    design_system: str | None = None
 
 
 class ParameterExtractionStage:
@@ -342,6 +343,13 @@ class ParameterExtractionStage:
                 else:
                     option_codes.append(str(entry))
 
+        raw_design_system = params.get("designSystem")
+        design_system = (
+            raw_design_system.strip()
+            if isinstance(raw_design_system, str) and raw_design_system.strip()
+            else None
+        )
+
         return ExtractedParams(
             stack=validated_stack,
             input_mode=validated_input_mode,
@@ -356,6 +364,7 @@ class ParameterExtractionStage:
             history=history,
             file_state=file_state,
             option_codes=option_codes,
+            design_system=design_system,
         )
 
     def _get_from_settings_dialog_or_env(
@@ -528,6 +537,7 @@ class PromptCreationStage:
                 history=extracted_params.history,
                 file_state=extracted_params.file_state,
                 image_generation_enabled=extracted_params.should_generate_images,
+                design_system=extracted_params.design_system,
             )
             print_prompt_preview(prompt_messages)
 

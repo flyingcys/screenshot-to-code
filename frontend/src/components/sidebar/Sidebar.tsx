@@ -15,6 +15,9 @@ import ImageLightbox from "../ImageLightbox";
 import { Commit } from "../commits/types";
 import { removeHighlight } from "../select-and-edit/utils";
 import { CodeGenerationModel } from "../../lib/models";
+import DesignSystemSelector, {
+  DesignSystemSelectorProps,
+} from "../settings/DesignSystemSelector";
 
 interface SidebarProps {
   showSelectAndEditFeature: boolean;
@@ -22,6 +25,7 @@ interface SidebarProps {
   regenerate: () => void;
   cancelCodeGeneration: () => void;
   onOpenVersions: () => void;
+  designSystem: DesignSystemSelectorProps;
 }
 
 const MAX_UPDATE_IMAGES = 5;
@@ -77,6 +81,7 @@ function Sidebar({
   regenerate,
   cancelCodeGeneration,
   onOpenVersions,
+  designSystem,
 }: SidebarProps) {
   const { t } = useI18n();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -221,7 +226,6 @@ function Sidebar({
     commits[head] &&
     commits[head].variants[commits[head].selectedVariantIndex].status ===
       "error";
-  const selectedVariantIndexForHead = head ? commits[head]?.selectedVariantIndex : undefined;
 
   // Get the error message from the selected variant
   const selectedVariantErrorMessage =
@@ -265,7 +269,7 @@ function Sidebar({
   // Reset error expanded state when variant changes
   useEffect(() => {
     setIsErrorExpanded(false);
-  }, [head, selectedVariantIndexForHead]);
+  }, [head, selectedVariantIndex]);
 
   // Reset prompt expanded state when commit changes and detect clamping
   useEffect(() => {
@@ -604,6 +608,7 @@ function Sidebar({
                       <LuMousePointerClick className="w-[18px] h-[18px]" />
                     </button>
                   )}
+                  <DesignSystemSelector {...designSystem} compact />
                 </div>
                 <button
                   onClick={() => doUpdate(updateInstruction)}

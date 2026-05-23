@@ -25,11 +25,20 @@ export interface Settings {
   editorTheme: EditorTheme;
   generatedCodeConfig: Stack;
   codeGenerationModel: CodeGenerationModelSetting;
+  selectedDesignSystemId: string | null;
   // Only relevant for hosted version
   isTermOfServiceAccepted: boolean;
   anthropicApiKey: string | null;
   geminiApiKey: string | null;
   locale: Locale;
+}
+
+export interface DesignSystem {
+  id: string;
+  name: string;
+  content: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export enum AppState {
@@ -79,4 +88,7 @@ export interface CodeGenerationParams {
   optionCodes?: string[];
 }
 
-export type FullGenerationSettings = CodeGenerationParams & Settings;
+export type FullGenerationSettings = CodeGenerationParams &
+  Settings & {
+    designSystem?: string | null;
+  };

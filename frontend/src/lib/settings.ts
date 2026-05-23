@@ -49,6 +49,7 @@ export function createDefaultSettings(): Settings {
     editorTheme: EditorTheme.COBALT,
     generatedCodeConfig: Stack.HTML_TAILWIND,
     codeGenerationModel: AUTO_CODE_GENERATION_MODEL,
+    selectedDesignSystemId: null,
     isTermOfServiceAccepted: false,
     locale: "auto",
   };

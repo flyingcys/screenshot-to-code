@@ -70,3 +70,19 @@ async def test_auto_code_generation_model_uses_backend_default_selection() -> No
     )
 
     assert extracted.code_generation_model is None
+
+
+@pytest.mark.asyncio
+async def test_extracts_design_system_from_request() -> None:
+    stage = ParameterExtractionStage(AsyncMock())
+
+    extracted = await stage.extract_and_validate(
+        {
+            "generatedCodeConfig": "html_css",
+            "inputMode": "text",
+            "prompt": {"text": "hello"},
+            "designSystem": "  Reuse .mockup-frame  ",
+        }
+    )
+
+    assert extracted.design_system == "Reuse .mockup-frame"

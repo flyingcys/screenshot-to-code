@@ -5,6 +5,7 @@ import { blobToBase64DataUrl } from "./utils";
 import fixWebmDuration from "webm-duration-fix";
 import toast from "react-hot-toast";
 import OutputSettingsSection from "../settings/OutputSettingsSection";
+import { DesignSystemSelectorProps } from "../settings/DesignSystemSelector";
 import { Stack } from "../../lib/stacks";
 import { useI18n } from "../../lib/i18n";
 
@@ -17,6 +18,7 @@ interface Props {
   ) => void;
   stack: Stack;
   setStack: (stack: Stack) => void;
+  designSystem?: DesignSystemSelectorProps;
 }
 
 function ScreenRecorder({
@@ -25,6 +27,7 @@ function ScreenRecorder({
   generateCode,
   stack,
   setStack,
+  designSystem,
 }: Props) {
   const [mediaStream, setMediaStream] = useState<MediaStream | null>(null);
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(
@@ -137,6 +140,7 @@ function ScreenRecorder({
             <OutputSettingsSection
               stack={stack}
               setStack={setStack}
+              designSystem={designSystem}
             />
           </div>
           <div className="flex gap-x-2 w-full">

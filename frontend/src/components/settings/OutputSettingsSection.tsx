@@ -9,12 +9,16 @@ import {
 import { Stack } from "../../lib/stacks";
 import StackLabel from "../core/StackLabel";
 import { useI18n } from "../../lib/i18n";
+import DesignSystemSelector, {
+  DesignSystemSelectorProps,
+} from "./DesignSystemSelector";
 
 interface Props {
   stack: Stack | undefined;
   setStack: (config: Stack) => void;
   label?: string;
   shouldDisableUpdates?: boolean;
+  designSystem?: DesignSystemSelectorProps;
 }
 
 function OutputSettingsSection({
@@ -22,6 +26,7 @@ function OutputSettingsSection({
   setStack,
   label,
   shouldDisableUpdates = false,
+  designSystem,
 }: Props) {
   const { t } = useI18n();
 
@@ -54,6 +59,9 @@ function OutputSettingsSection({
           </SelectContent>
         </Select>
       </div>
+      {designSystem && (
+        <DesignSystemSelector {...designSystem} />
+      )}
     </div>
   );
 }

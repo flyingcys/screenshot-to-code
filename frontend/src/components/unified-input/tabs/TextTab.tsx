@@ -3,6 +3,7 @@ import { Button } from "../../ui/button";
 import { Textarea } from "../../ui/textarea";
 import toast from "react-hot-toast";
 import OutputSettingsSection from "../../settings/OutputSettingsSection";
+import { DesignSystemSelectorProps } from "../../settings/DesignSystemSelector";
 import { Stack } from "../../../lib/stacks";
 import { useI18n } from "../../../lib/i18n";
 
@@ -10,6 +11,7 @@ interface Props {
   doCreateFromText: (text: string) => void;
   stack: Stack;
   setStack: (stack: Stack) => void;
+  designSystem: DesignSystemSelectorProps;
 }
 
 const EXAMPLE_PROMPTS = [
@@ -19,7 +21,7 @@ const EXAMPLE_PROMPTS = [
   "一个音乐流媒体应用，包含正在播放、推荐歌单和最近播放记录",
 ];
 
-function TextTab({ doCreateFromText, stack, setStack }: Props) {
+function TextTab({ doCreateFromText, stack, setStack, designSystem }: Props) {
   const [text, setText] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { t } = useI18n();
@@ -110,6 +112,7 @@ function TextTab({ doCreateFromText, stack, setStack }: Props) {
             <OutputSettingsSection
               stack={stack}
               setStack={setStack}
+              designSystem={designSystem}
             />
 
             <Button
