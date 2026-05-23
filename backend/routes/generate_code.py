@@ -9,10 +9,9 @@ from websockets.exceptions import ConnectionClosedOK, ConnectionClosedError
 from config import (
     ANTHROPIC_API_KEY,
     GEMINI_API_KEY,
+    get_variant_count,
     IS_DEBUG_ENABLED,
     IS_PROD,
-    NUM_VARIANTS,
-    NUM_VARIANTS_VIDEO,
     OPENAI_API_KEY,
     OPENAI_BASE_URL,
     REPLICATE_API_KEY,
@@ -400,7 +399,9 @@ class ModelSelectionStage:
     ) -> List[Llm]:
         """Select appropriate models based on available API keys"""
         try:
-            num_variants = 2 if generation_type == "update" else NUM_VARIANTS
+            # Keep one shared variant-count policy so identical requests do not
+            # fan out into near-duplicate generations and waste tokens.
+            num_variants = get_variant_count(generation_type, input_mode)
             if selected_model is not None:
                 self._validate_selected_model(
                     selected_model=selected_model,
@@ -477,14 +478,13 @@ class ModelSelectionStage:
     ) -> List[Llm]:
         """Simple model cycling that scales with num_variants"""
 
-        # Video mode requires Gemini - 2 variants for comparison
         if input_mode == "video":
             if not gemini_api_key:
                 raise Exception(
                     "Video mode requires a Gemini API key. "
                     "Please add GEMINI_API_KEY to backend/.env or in the settings dialog"
                 )
-            return list(VIDEO_VARIANT_MODELS)
+            return list(VIDEO_VARIANT_MODELS[:num_variants])
 
         # Define models based on available API keys
         if gemini_api_key and anthropic_api_key and openai_api_key:
@@ -752,13 +752,12 @@ class StatusBroadcastMiddleware(Middleware):
     async def process(
         self, context: PipelineContext, next_func: Callable[[], Awaitable[None]]
     ) -> None:
-        # Determine variant count based on input mode and generation type.
-        # Edit/update flows use two variants to keep latency and cost down.
         assert context.extracted_params is not None
-        is_video_mode = context.extracted_params.input_mode == "video"
-        is_update = context.extracted_params.generation_type == "update"
-        num_variants = (
-            NUM_VARIANTS_VIDEO if is_video_mode else 2 if is_update else NUM_VARIANTS
+        # Reuse the same single-variant policy as model selection so we do not
+        # spin up parallel near-duplicates for one request.
+        num_variants = get_variant_count(
+            context.extracted_params.generation_type,
+            context.extracted_params.input_mode,
         )
 
         # Tell frontend how many variants we're using

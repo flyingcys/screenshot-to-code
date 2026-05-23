@@ -1,7 +1,17 @@
 import os
 
-NUM_VARIANTS = 4
-NUM_VARIANTS_VIDEO = 2
+# Keep a single variant per request so the same prompt is not generated multiple
+# times in parallel, which would waste tokens for near-duplicate results.
+NUM_VARIANTS = 1
+NUM_VARIANTS_VIDEO = 1
+
+
+def get_variant_count(generation_type: str, input_mode: str) -> int:
+    """Return the shared variant count policy for every generation flow."""
+    if input_mode == "video":
+        return NUM_VARIANTS_VIDEO
+
+    return NUM_VARIANTS
 
 # LLM-related
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", None)

@@ -159,3 +159,334 @@ WARNING:  StatReload detected changes in 'routes/generate_code.py'. Reloading...
 INFO:     Started server process [78395]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
+INFO:     Will watch for changes in these directories: ['/Users/cys/ai-coding/screenshot-to-code/backend']
+INFO:     Uvicorn running on http://0.0.0.0:7001 (Press CTRL+C to quit)
+INFO:     Started reloader process [74624] using StatReload
+INFO:     Started server process [74631]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+Backend startup complete. Debug mode is DISABLED.
+INFO:     127.0.0.1:52813 - "GET /api/design-systems HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52813 - "GET /api/design-systems HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53336 - "GET /api/design-systems HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53336 - "GET /api/design-systems HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53367 - "GET /api/design-systems HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53367 - "GET /api/design-systems HTTP/1.1" 200 OK
+INFO:     ('127.0.0.1', 54286) - "WebSocket /generate-code" [accepted]
+INFO:     connection open
+Traceback (most recent call last):
+  File "/Users/cys/Library/Caches/pypoetry/virtualenvs/backend-wfgHDHXq-py3.10/lib/python3.10/site-packages/httpx/_transports/default.py", line 101, in map_httpcore_exceptions
+    yield
+  File "/Users/cys/Library/Caches/pypoetry/virtualenvs/backend-wfgHDHXq-py3.10/lib/python3.10/site-packages/httpx/_transports/default.py", line 394, in handle_async_request
+    resp = await self._pool.handle_async_request(req)
+  File "/Users/cys/Library/Caches/pypoetry/virtualenvs/backend-wfgHDHXq-py3.10/lib/python3.10/site-packages/httpcore/_async/connection_pool.py", line 256, in handle_async_request
+    raise exc from None
+  File "/Users/cys/Library/Caches/pypoetry/virtualenvs/backend-wfgHDHXq-py3.10/lib/python3.10/site-packages/httpcore/_async/connection_pool.py", line 236, in handle_async_request
+    response = await connection.handle_async_request(
+  File "/Users/cys/Library/Caches/pypoetry/virtualenvs/backend-wfgHDHXq-py3.10/lib/python3.10/site-packages/httpcore/_async/http_proxy.py", line 316, in handle_async_request
+    stream = await stream.start_tls(**kwargs)
+  File "/Users/cys/Library/Caches/pypoetry/virtualenvs/backend-wfgHDHXq-py3.10/lib/python3.10/site-packages/httpcore/_async/http11.py", line 376, in start_tls
+    return await self._stream.start_tls(ssl_context, server_hostname, timeout)
+  File "/Users/cys/Library/Caches/pypoetry/virtualenvs/backend-wfgHDHXq-py3.10/lib/python3.10/site-packages/httpcore/_backends/anyio.py", line 67, in start_tls
+    with map_exceptions(exc_map):
+  File "/Users/cys/.local/share/uv/python/cpython-3.10.19-macos-aarch64-none/lib/python3.10/contextlib.py", line 153, in __exit__
+    self.gen.throw(typ, value, traceback)
+  File "/Users/cys/Library/Caches/pypoetry/virtualenvs/backend-wfgHDHXq-py3.10/lib/python3.10/site-packages/httpcore/_exceptions.py", line 14, in map_exceptions
+    raise to_exc(exc) from exc
+httpcore.ConnectError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/cys/Library/Caches/pypoetry/virtualenvs/backend-wfgHDHXq-py3.10/lib/python3.10/site-packages/openai/_base_client.py", line 1601, in request
+    response = await self._client.send(
+  File "/Users/cys/Library/Caches/pypoetry/virtualenvs/backend-wfgHDHXq-py3.10/lib/python3.10/site-packages/httpx/_client.py", line 1629, in send
+    response = await self._send_handling_auth(
+  File "/Users/cys/Library/Caches/pypoetry/virtualenvs/backend-wfgHDHXq-py3.10/lib/python3.10/site-packages/httpx/_client.py", line 1657, in _send_handling_auth
+    response = await self._send_handling_redirects(
+  File "/Users/cys/Library/Caches/pypoetry/virtualenvs/backend-wfgHDHXq-py3.10/lib/python3.10/site-packages/httpx/_client.py", line 1694, in _send_handling_redirects
+    response = await self._send_single_request(request)
+  File "/Users/cys/Library/Caches/pypoetry/virtualenvs/backend-wfgHDHXq-py3.10/lib/python3.10/site-packages/httpx/_client.py", line 1730, in _send_single_request
+    response = await transport.handle_async_request(request)
+  File "/Users/cys/Library/Caches/pypoetry/virtualenvs/backend-wfgHDHXq-py3.10/lib/python3.10/site-packages/httpx/_transports/default.py", line 393, in handle_async_request
+    with map_httpcore_exceptions():
+  File "/Users/cys/.local/share/uv/python/cpython-3.10.19-macos-aarch64-none/lib/python3.10/contextlib.py", line 153, in __exit__
+    self.gen.throw(typ, value, traceback)
+  File "/Users/cys/Library/Caches/pypoetry/virtualenvs/backend-wfgHDHXq-py3.10/lib/python3.10/site-packages/httpx/_transports/default.py", line 118, in map_httpcore_exceptions
+    raise mapped_exc(message) from exc
+httpx.ConnectError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/cys/ai-coding/screenshot-to-code/backend/routes/generate_code.py", line 647, in _run_variant
+    completion = await runner.run(model, prompt_messages)
+  File "/Users/cys/ai-coding/screenshot-to-code/backend/agent/engine.py", line 241, in run
+    return await self._run_with_session(session)
+  File "/Users/cys/ai-coding/screenshot-to-code/backend/agent/engine.py", line 184, in _run_with_session
+    turn = await session.stream_turn(on_event)
+  File "/Users/cys/ai-coding/screenshot-to-code/backend/agent/providers/openai.py", line 449, in stream_turn
+    stream = await self._client.responses.create(**params)  # type: ignore
+  File "/Users/cys/Library/Caches/pypoetry/virtualenvs/backend-wfgHDHXq-py3.10/lib/python3.10/site-packages/openai/resources/responses/responses.py", line 2480, in create
+    return await self._post(
+  File "/Users/cys/Library/Caches/pypoetry/virtualenvs/backend-wfgHDHXq-py3.10/lib/python3.10/site-packages/openai/_base_client.py", line 1881, in post
+    return await self.request(cast_to, opts, stream=stream, stream_cls=stream_cls)
+  File "/Users/cys/Library/Caches/pypoetry/virtualenvs/backend-wfgHDHXq-py3.10/lib/python3.10/site-packages/openai/_base_client.py", line 1633, in request
+    raise APIConnectionError(request=request) from err
+openai.APIConnectionError: Connection error.
+Traceback (most recent call last):
+  File "/Users/cys/Library/Caches/pypoetry/virtualenvs/backend-wfgHDHXq-py3.10/lib/python3.10/site-packages/httpx/_transports/default.py", line 101, in map_httpcore_exceptions
+    yield
+  File "/Users/cys/Library/Caches/pypoetry/virtualenvs/backend-wfgHDHXq-py3.10/lib/python3.10/site-packages/httpx/_transports/default.py", line 394, in handle_async_request
+    resp = await self._pool.handle_async_request(req)
+  File "/Users/cys/Library/Caches/pypoetry/virtualenvs/backend-wfgHDHXq-py3.10/lib/python3.10/site-packages/httpcore/_async/connection_pool.py", line 256, in handle_async_request
+    raise exc from None
+  File "/Users/cys/Library/Caches/pypoetry/virtualenvs/backend-wfgHDHXq-py3.10/lib/python3.10/site-packages/httpcore/_async/connection_pool.py", line 236, in handle_async_request
+    response = await connection.handle_async_request(
+  File "/Users/cys/Library/Caches/pypoetry/virtualenvs/backend-wfgHDHXq-py3.10/lib/python3.10/site-packages/httpcore/_async/http_proxy.py", line 316, in handle_async_request
+    stream = await stream.start_tls(**kwargs)
+  File "/Users/cys/Library/Caches/pypoetry/virtualenvs/backend-wfgHDHXq-py3.10/lib/python3.10/site-packages/httpcore/_async/http11.py", line 376, in start_tls
+    return await self._stream.start_tls(ssl_context, server_hostname, timeout)
+  File "/Users/cys/Library/Caches/pypoetry/virtualenvs/backend-wfgHDHXq-py3.10/lib/python3.10/site-packages/httpcore/_backends/anyio.py", line 67, in start_tls
+    with map_exceptions(exc_map):
+  File "/Users/cys/.local/share/uv/python/cpython-3.10.19-macos-aarch64-none/lib/python3.10/contextlib.py", line 153, in __exit__
+    self.gen.throw(typ, value, traceback)
+  File "/Users/cys/Library/Caches/pypoetry/virtualenvs/backend-wfgHDHXq-py3.10/lib/python3.10/site-packages/httpcore/_exceptions.py", line 14, in map_exceptions
+    raise to_exc(exc) from exc
+httpcore.ConnectError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/cys/Library/Caches/pypoetry/virtualenvs/backend-wfgHDHXq-py3.10/lib/python3.10/site-packages/openai/_base_client.py", line 1601, in request
+    response = await self._client.send(
+  File "/Users/cys/Library/Caches/pypoetry/virtualenvs/backend-wfgHDHXq-py3.10/lib/python3.10/site-packages/httpx/_client.py", line 1629, in send
+    response = await self._send_handling_auth(
+  File "/Users/cys/Library/Caches/pypoetry/virtualenvs/backend-wfgHDHXq-py3.10/lib/python3.10/site-packages/httpx/_client.py", line 1657, in _send_handling_auth
+    response = await self._send_handling_redirects(
+  File "/Users/cys/Library/Caches/pypoetry/virtualenvs/backend-wfgHDHXq-py3.10/lib/python3.10/site-packages/httpx/_client.py", line 1694, in _send_handling_redirects
+    response = await self._send_single_request(request)
+  File "/Users/cys/Library/Caches/pypoetry/virtualenvs/backend-wfgHDHXq-py3.10/lib/python3.10/site-packages/httpx/_client.py", line 1730, in _send_single_request
+    response = await transport.handle_async_request(request)
+  File "/Users/cys/Library/Caches/pypoetry/virtualenvs/backend-wfgHDHXq-py3.10/lib/python3.10/site-packages/httpx/_transports/default.py", line 393, in handle_async_request
+    with map_httpcore_exceptions():
+  File "/Users/cys/.local/share/uv/python/cpython-3.10.19-macos-aarch64-none/lib/python3.10/contextlib.py", line 153, in __exit__
+    self.gen.throw(typ, value, traceback)
+  File "/Users/cys/Library/Caches/pypoetry/virtualenvs/backend-wfgHDHXq-py3.10/lib/python3.10/site-packages/httpx/_transports/default.py", line 118, in map_httpcore_exceptions
+    raise mapped_exc(message) from exc
+httpx.ConnectError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/cys/ai-coding/screenshot-to-code/backend/routes/generate_code.py", line 647, in _run_variant
+    completion = await runner.run(model, prompt_messages)
+  File "/Users/cys/ai-coding/screenshot-to-code/backend/agent/engine.py", line 241, in run
+    return await self._run_with_session(session)
+  File "/Users/cys/ai-coding/screenshot-to-code/backend/agent/engine.py", line 184, in _run_with_session
+    turn = await session.stream_turn(on_event)
+  File "/Users/cys/ai-coding/screenshot-to-code/backend/agent/providers/openai.py", line 449, in stream_turn
+    stream = await self._client.responses.create(**params)  # type: ignore
+  File "/Users/cys/Library/Caches/pypoetry/virtualenvs/backend-wfgHDHXq-py3.10/lib/python3.10/site-packages/openai/resources/responses/responses.py", line 2480, in create
+    return await self._post(
+  File "/Users/cys/Library/Caches/pypoetry/virtualenvs/backend-wfgHDHXq-py3.10/lib/python3.10/site-packages/openai/_base_client.py", line 1881, in post
+    return await self.request(cast_to, opts, stream=stream, stream_cls=stream_cls)
+  File "/Users/cys/Library/Caches/pypoetry/virtualenvs/backend-wfgHDHXq-py3.10/lib/python3.10/site-packages/openai/_base_client.py", line 1633, in request
+    raise APIConnectionError(request=request) from err
+openai.APIConnectionError: Connection error.
+Traceback (most recent call last):
+  File "/Users/cys/Library/Caches/pypoetry/virtualenvs/backend-wfgHDHXq-py3.10/lib/python3.10/site-packages/httpx/_transports/default.py", line 101, in map_httpcore_exceptions
+    yield
+  File "/Users/cys/Library/Caches/pypoetry/virtualenvs/backend-wfgHDHXq-py3.10/lib/python3.10/site-packages/httpx/_transports/default.py", line 394, in handle_async_request
+    resp = await self._pool.handle_async_request(req)
+  File "/Users/cys/Library/Caches/pypoetry/virtualenvs/backend-wfgHDHXq-py3.10/lib/python3.10/site-packages/httpcore/_async/connection_pool.py", line 256, in handle_async_request
+    raise exc from None
+  File "/Users/cys/Library/Caches/pypoetry/virtualenvs/backend-wfgHDHXq-py3.10/lib/python3.10/site-packages/httpcore/_async/connection_pool.py", line 236, in handle_async_request
+    response = await connection.handle_async_request(
+  File "/Users/cys/Library/Caches/pypoetry/virtualenvs/backend-wfgHDHXq-py3.10/lib/python3.10/site-packages/httpcore/_async/http_proxy.py", line 316, in handle_async_request
+    stream = await stream.start_tls(**kwargs)
+  File "/Users/cys/Library/Caches/pypoetry/virtualenvs/backend-wfgHDHXq-py3.10/lib/python3.10/site-packages/httpcore/_async/http11.py", line 376, in start_tls
+    return await self._stream.start_tls(ssl_context, server_hostname, timeout)
+  File "/Users/cys/Library/Caches/pypoetry/virtualenvs/backend-wfgHDHXq-py3.10/lib/python3.10/site-packages/httpcore/_backends/anyio.py", line 67, in start_tls
+    with map_exceptions(exc_map):
+  File "/Users/cys/.local/share/uv/python/cpython-3.10.19-macos-aarch64-none/lib/python3.10/contextlib.py", line 153, in __exit__
+    self.gen.throw(typ, value, traceback)
+  File "/Users/cys/Library/Caches/pypoetry/virtualenvs/backend-wfgHDHXq-py3.10/lib/python3.10/site-packages/httpcore/_exceptions.py", line 14, in map_exceptions
+    raise to_exc(exc) from exc
+httpcore.ConnectError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/cys/Library/Caches/pypoetry/virtualenvs/backend-wfgHDHXq-py3.10/lib/python3.10/site-packages/openai/_base_client.py", line 1601, in request
+    response = await self._client.send(
+  File "/Users/cys/Library/Caches/pypoetry/virtualenvs/backend-wfgHDHXq-py3.10/lib/python3.10/site-packages/httpx/_client.py", line 1629, in send
+    response = await self._send_handling_auth(
+  File "/Users/cys/Library/Caches/pypoetry/virtualenvs/backend-wfgHDHXq-py3.10/lib/python3.10/site-packages/httpx/_client.py", line 1657, in _send_handling_auth
+    response = await self._send_handling_redirects(
+  File "/Users/cys/Library/Caches/pypoetry/virtualenvs/backend-wfgHDHXq-py3.10/lib/python3.10/site-packages/httpx/_client.py", line 1694, in _send_handling_redirects
+    response = await self._send_single_request(request)
+  File "/Users/cys/Library/Caches/pypoetry/virtualenvs/backend-wfgHDHXq-py3.10/lib/python3.10/site-packages/httpx/_client.py", line 1730, in _send_single_request
+    response = await transport.handle_async_request(request)
+  File "/Users/cys/Library/Caches/pypoetry/virtualenvs/backend-wfgHDHXq-py3.10/lib/python3.10/site-packages/httpx/_transports/default.py", line 393, in handle_async_request
+    with map_httpcore_exceptions():
+  File "/Users/cys/.local/share/uv/python/cpython-3.10.19-macos-aarch64-none/lib/python3.10/contextlib.py", line 153, in __exit__
+    self.gen.throw(typ, value, traceback)
+  File "/Users/cys/Library/Caches/pypoetry/virtualenvs/backend-wfgHDHXq-py3.10/lib/python3.10/site-packages/httpx/_transports/default.py", line 118, in map_httpcore_exceptions
+    raise mapped_exc(message) from exc
+httpx.ConnectError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/cys/ai-coding/screenshot-to-code/backend/routes/generate_code.py", line 647, in _run_variant
+    completion = await runner.run(model, prompt_messages)
+  File "/Users/cys/ai-coding/screenshot-to-code/backend/agent/engine.py", line 241, in run
+    return await self._run_with_session(session)
+  File "/Users/cys/ai-coding/screenshot-to-code/backend/agent/engine.py", line 184, in _run_with_session
+    turn = await session.stream_turn(on_event)
+  File "/Users/cys/ai-coding/screenshot-to-code/backend/agent/providers/openai.py", line 449, in stream_turn
+    stream = await self._client.responses.create(**params)  # type: ignore
+  File "/Users/cys/Library/Caches/pypoetry/virtualenvs/backend-wfgHDHXq-py3.10/lib/python3.10/site-packages/openai/resources/responses/responses.py", line 2480, in create
+    return await self._post(
+  File "/Users/cys/Library/Caches/pypoetry/virtualenvs/backend-wfgHDHXq-py3.10/lib/python3.10/site-packages/openai/_base_client.py", line 1881, in post
+    return await self.request(cast_to, opts, stream=stream, stream_cls=stream_cls)
+  File "/Users/cys/Library/Caches/pypoetry/virtualenvs/backend-wfgHDHXq-py3.10/lib/python3.10/site-packages/openai/_base_client.py", line 1633, in request
+    raise APIConnectionError(request=request) from err
+openai.APIConnectionError: Connection error.
+INFO:     connection closed
+Incoming websocket connection...
+Received params
+Using openAiApiKey from client-side settings dialog
+Using openAiBaseURL from client-side settings dialog
+Generating vue_tailwind code in image mode
+Status (variant 1): Generating code...
+Status (variant 2): Generating code...
+Status (variant 3): Generating code...
+Status (variant 4): Generating code...
+┌────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│                                             PROMPT PREVIEW                                             │
+├────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ 1. SYSTEM                                                                                              │
+│    You are a coding agent that's an expert at building front-ends. # Tone and style - Be extremely     │
+│    concise in your chat responses. - Do not inc ... [collapsed 3983 chars] ...                         │
+│    .cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"></link>                              │
+│ 2. USER [1 media]                                                                                      │
+│    Generate code for a web page that looks exactly like the provided screenshot(s). Selected stack:    │
+│    vue_tailwind. ## Replication instructions - ... [collapsed 670 chars] ... e device frame or browser │
+│    chrome; focus only on the actual UI mockups.                                                        │
+└────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+Variant models:
+Variant 1: gpt-5.4-2026-03-05 (medium thinking)
+Variant 2: gpt-5.4-2026-03-05 (medium thinking)
+Variant 3: gpt-5.4-2026-03-05 (medium thinking)
+Variant 4: gpt-5.4-2026-03-05 (medium thinking)
+[TOKEN USAGE] provider=openai model=gpt-5.4-2026-03-05 | input=0 output=0 cache_read=0 cache_write=0 total=0 cache_hit_rate=0.00% cost=$0.0000
+Error in variant 1: Connection error.
+Variant 1 error: Connection error.
+[TOKEN USAGE] provider=openai model=gpt-5.4-2026-03-05 | input=0 output=0 cache_read=0 cache_write=0 total=0 cache_hit_rate=0.00% cost=$0.0000
+Error in variant 3: Connection error.
+Variant 3 error: Connection error.
+[TOKEN USAGE] provider=openai model=gpt-5.4-2026-03-05 | input=0 output=0 cache_read=0 cache_write=0 total=0 cache_hit_rate=0.00% cost=$0.0000
+Error in variant 4: Connection error.
+Variant 4 error: Connection error.
+[TOKEN USAGE] provider=openai model=gpt-5.4-2026-03-05 | input=10129 output=4291 cache_read=0 cache_write=0 total=14420 cache_hit_rate=0.00% cost=$0.0897
+Variant 2 complete
+INFO:     127.0.0.1:54749 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54750 - "HEAD /openapi.json HTTP/1.1" 404 Not Found
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [74631]
+INFO:     Stopping reloader process [74624]
+INFO:     Will watch for changes in these directories: ['/Users/cys/ai-coding/screenshot-to-code/backend']
+INFO:     Uvicorn running on http://0.0.0.0:7001 (Press CTRL+C to quit)
+INFO:     Started reloader process [98500] using StatReload
+INFO:     Started server process [98561]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+Backend startup complete. Debug mode is DISABLED.
+INFO:     127.0.0.1:61034 - "GET /api/design-systems HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61034 - "GET /api/design-systems HTTP/1.1" 200 OK
+INFO:     ('127.0.0.1', 61105) - "WebSocket /generate-code" [accepted]
+INFO:     connection open
+INFO:     connection closed
+Incoming websocket connection...
+Received params
+Using openAiApiKey from client-side settings dialog
+Using openAiBaseURL from client-side settings dialog
+Generating html_css code in image mode
+Status (variant 1): Generating code...
+Status (variant 2): Generating code...
+Status (variant 3): Generating code...
+Status (variant 4): Generating code...
+┌────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│                                             PROMPT PREVIEW                                             │
+├────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ 1. SYSTEM                                                                                              │
+│    You are a coding agent that's an expert at building front-ends. # Tone and style - Be extremely     │
+│    concise in your chat responses. - Do not inc ... [collapsed 3983 chars] ...                         │
+│    .cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"></link>                              │
+│ 2. USER [1 media]                                                                                      │
+│    Generate code for a web page that looks exactly like the provided screenshot(s). Selected stack:    │
+│    html_css. ## Replication instructions - Mak ... [collapsed 666 chars] ... e device frame or browser │
+│    chrome; focus only on the actual UI mockups.                                                        │
+└────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+Variant models:
+Variant 1: gpt-5.4-2026-03-05 (medium thinking)
+Variant 2: gpt-5.4-2026-03-05 (medium thinking)
+Variant 3: gpt-5.4-2026-03-05 (medium thinking)
+Variant 4: gpt-5.4-2026-03-05 (medium thinking)
+[TOKEN USAGE] provider=openai model=gpt-5.4-2026-03-05 | input=6811 output=5544 cache_read=4608 cache_write=0 total=16963 cache_hit_rate=40.35% cost=$0.1013
+Variant 3 complete
+[TOKEN USAGE] provider=openai model=gpt-5.4-2026-03-05 | input=6425 output=5667 cache_read=5120 cache_write=0 total=17212 cache_hit_rate=44.35% cost=$0.1023
+Variant 1 complete
+[TOKEN USAGE] provider=openai model=gpt-5.4-2026-03-05 | input=11087 output=5202 cache_read=0 cache_write=0 total=16289 cache_hit_rate=0.00% cost=$0.1057
+Variant 4 complete
+[TOKEN USAGE] provider=openai model=gpt-5.4-2026-03-05 | input=9952 output=4082 cache_read=0 cache_write=0 total=14034 cache_hit_rate=0.00% cost=$0.0861
+Variant 2 complete
+INFO:     127.0.0.1:61953 - "OPTIONS /api/export HTTP/1.1" 200 OK
+Export complete: candidates=0 assets=0 skipped=0 responseBytes=3222
+INFO:     127.0.0.1:61954 - "POST /api/export HTTP/1.1" 200 OK
+Export complete: candidates=0 assets=0 skipped=0 responseBytes=3793
+INFO:     127.0.0.1:62014 - "POST /api/export HTTP/1.1" 200 OK
+Export complete: candidates=0 assets=0 skipped=0 responseBytes=3222
+INFO:     127.0.0.1:62053 - "POST /api/export HTTP/1.1" 200 OK
+Export complete: candidates=0 assets=0 skipped=0 responseBytes=3476
+INFO:     127.0.0.1:62070 - "POST /api/export HTTP/1.1" 200 OK
+Export complete: candidates=0 assets=0 skipped=0 responseBytes=3342
+INFO:     127.0.0.1:62096 - "POST /api/export HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [98561]
+INFO:     Stopping reloader process [98500]
+INFO:     Will watch for changes in these directories: ['/Users/cys/ai-coding/screenshot-to-code/backend']
+INFO:     Uvicorn running on http://0.0.0.0:7001 (Press CTRL+C to quit)
+INFO:     Started reloader process [13022] using StatReload
+INFO:     Started server process [13031]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+Backend startup complete. Debug mode is DISABLED.
+INFO:     127.0.0.1:65297 - "GET /api/design-systems HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65297 - "GET /api/design-systems HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65297 - "GET /api/design-systems HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65297 - "GET /api/design-systems HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [13031]
+INFO:     Stopping reloader process [13022]
+INFO:     Will watch for changes in these directories: ['/Users/cys/ai-coding/screenshot-to-code/backend']
+INFO:     Uvicorn running on http://0.0.0.0:7001 (Press CTRL+C to quit)
+INFO:     Started reloader process [9885] using StatReload
+INFO:     Started server process [9892]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+Backend startup complete. Debug mode is DISABLED.
+INFO:     127.0.0.1:56777 - "GET /api/design-systems HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56777 - "GET /api/design-systems HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56809 - "GET /api/design-systems HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56809 - "GET /api/design-systems HTTP/1.1" 200 OK

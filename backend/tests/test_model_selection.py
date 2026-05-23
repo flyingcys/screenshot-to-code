@@ -1,7 +1,26 @@
 import pytest
 from unittest.mock import AsyncMock
+from config import get_variant_count
 from routes.generate_code import ModelSelectionStage
 from llm import Llm
+
+
+@pytest.mark.parametrize(
+    ("generation_type", "input_mode"),
+    [
+        ("create", "image"),
+        ("create", "text"),
+        ("update", "image"),
+        ("update", "text"),
+        ("create", "video"),
+        ("update", "video"),
+    ],
+)
+def test_get_variant_count_uses_single_variant_policy(
+    generation_type: str, input_mode: str
+) -> None:
+    """All generation flows stay on one variant to avoid duplicate token spend."""
+    assert get_variant_count(generation_type, input_mode) == 1
 
 
 class TestModelSelectionAllKeys:
@@ -14,7 +33,7 @@ class TestModelSelectionAllKeys:
 
     @pytest.mark.asyncio
     async def test_gemini_anthropic_create(self):
-        """All keys: fixed order for four variants."""
+        """All keys: create mode should keep a single variant to avoid duplicate runs."""
         models = await self.model_selector.select_models(
             generation_type="create",
             input_mode="text",
@@ -23,17 +42,12 @@ class TestModelSelectionAllKeys:
             gemini_api_key="key",
         )
 
-        expected = [
-            Llm.GEMINI_3_FLASH_PREVIEW_MINIMAL,
-            Llm.GPT_5_2_CODEX_HIGH,
-            Llm.CLAUDE_OPUS_4_6,
-            Llm.GEMINI_3_1_PRO_PREVIEW_LOW,
-        ]
+        expected = [Llm.GEMINI_3_FLASH_PREVIEW_MINIMAL]
         assert models == expected
 
     @pytest.mark.asyncio
     async def test_gemini_anthropic_update_text(self):
-        """All keys text update: uses two fast edit variants."""
+        """All keys text update: should keep one edit variant to reduce repeated generations."""
         models = await self.model_selector.select_models(
             generation_type="update",
             input_mode="text",
@@ -42,15 +56,12 @@ class TestModelSelectionAllKeys:
             gemini_api_key="key",
         )
 
-        expected = [
-            Llm.GEMINI_3_FLASH_PREVIEW_MINIMAL,
-            Llm.GPT_5_4_2026_03_05_LOW,
-        ]
+        expected = [Llm.GEMINI_3_FLASH_PREVIEW_MINIMAL]
         assert models == expected
 
     @pytest.mark.asyncio
     async def test_gemini_anthropic_update(self):
-        """All keys image update: uses two fast edit variants."""
+        """All keys image update: should keep one edit variant to reduce repeated generations."""
         models = await self.model_selector.select_models(
             generation_type="update",
             input_mode="image",
@@ -59,15 +70,12 @@ class TestModelSelectionAllKeys:
             gemini_api_key="key",
         )
 
-        expected = [
-            Llm.GEMINI_3_FLASH_PREVIEW_MINIMAL,
-            Llm.GPT_5_4_2026_03_05_LOW,
-        ]
+        expected = [Llm.GEMINI_3_FLASH_PREVIEW_MINIMAL]
         assert models == expected
 
     @pytest.mark.asyncio
     async def test_video_create_prefers_gemini_minimal_then_3_1_high(self):
-        """Video create always uses two Gemini variants in fixed order."""
+        """Video create should keep a single Gemini variant to avoid duplicate runs."""
         models = await self.model_selector.select_models(
             generation_type="create",
             input_mode="video",
@@ -76,15 +84,12 @@ class TestModelSelectionAllKeys:
             gemini_api_key="key",
         )
 
-        expected = [
-            Llm.GEMINI_3_FLASH_PREVIEW_MINIMAL,
-            Llm.GEMINI_3_1_PRO_PREVIEW_HIGH,
-        ]
+        expected = [Llm.GEMINI_3_FLASH_PREVIEW_MINIMAL]
         assert models == expected
 
     @pytest.mark.asyncio
     async def test_video_update_prefers_gemini_minimal_then_3_1_high(self):
-        """Video update always uses the same two Gemini variants as video create."""
+        """Video update should also keep a single Gemini variant to avoid duplicate runs."""
         models = await self.model_selector.select_models(
             generation_type="update",
             input_mode="video",
@@ -93,15 +98,12 @@ class TestModelSelectionAllKeys:
             gemini_api_key="key",
         )
 
-        expected = [
-            Llm.GEMINI_3_FLASH_PREVIEW_MINIMAL,
-            Llm.GEMINI_3_1_PRO_PREVIEW_HIGH,
-        ]
+        expected = [Llm.GEMINI_3_FLASH_PREVIEW_MINIMAL]
         assert models == expected
 
     @pytest.mark.asyncio
     async def test_selected_model_overrides_automatic_variant_mix(self):
-        """Explicit model selection should pin all variants to the chosen model."""
+        """Explicit model selection should still only produce one variant."""
         models = await self.model_selector.select_models(
             generation_type="create",
             input_mode="text",
@@ -111,9 +113,33 @@ class TestModelSelectionAllKeys:
             selected_model=Llm.GPT_5_4_2026_03_05_LOW,
         )
 
+        assert models == [Llm.GPT_5_4_2026_03_05_LOW]
+
+    @pytest.mark.asyncio
+    async def test_selected_model_uses_shared_variant_count_policy(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Model selection should read variant count from the shared policy helper."""
+
+        def fake_get_variant_count(generation_type: str, input_mode: str) -> int:
+            assert generation_type == "update"
+            assert input_mode == "text"
+            return 2
+
+        monkeypatch.setattr(
+            "routes.generate_code.get_variant_count", fake_get_variant_count
+        )
+
+        models = await self.model_selector.select_models(
+            generation_type="update",
+            input_mode="text",
+            openai_api_key="key",
+            anthropic_api_key="key",
+            gemini_api_key="key",
+            selected_model=Llm.GPT_5_4_2026_03_05_LOW,
+        )
+
         assert models == [
-            Llm.GPT_5_4_2026_03_05_LOW,
-            Llm.GPT_5_4_2026_03_05_LOW,
             Llm.GPT_5_4_2026_03_05_LOW,
             Llm.GPT_5_4_2026_03_05_LOW,
         ]
@@ -129,7 +155,7 @@ class TestModelSelectionOpenAIAnthropic:
 
     @pytest.mark.asyncio
     async def test_openai_anthropic(self):
-        """OpenAI + Anthropic: Claude Opus 4.6, GPT 5.2 Codex (high/medium), cycling"""
+        """OpenAI + Anthropic: create mode keeps the top single candidate only."""
         models = await self.model_selector.select_models(
             generation_type="create",
             input_mode="text",
@@ -138,12 +164,7 @@ class TestModelSelectionOpenAIAnthropic:
             gemini_api_key=None,
         )
 
-        expected = [
-            Llm.CLAUDE_OPUS_4_6,
-            Llm.GPT_5_2_CODEX_HIGH,
-            Llm.GPT_5_2_CODEX_MEDIUM,
-            Llm.CLAUDE_OPUS_4_6,
-        ]
+        expected = [Llm.CLAUDE_OPUS_4_6]
         assert models == expected
 
 
@@ -157,7 +178,7 @@ class TestModelSelectionAnthropicOnly:
 
     @pytest.mark.asyncio
     async def test_anthropic_only(self):
-        """Anthropic only: Claude Opus 4.6 and Claude Sonnet 4.6 cycling"""
+        """Anthropic only: create mode keeps the top single candidate only."""
         models = await self.model_selector.select_models(
             generation_type="create",
             input_mode="text",
@@ -166,12 +187,7 @@ class TestModelSelectionAnthropicOnly:
             gemini_api_key=None,
         )
 
-        expected = [
-            Llm.CLAUDE_OPUS_4_6,
-            Llm.CLAUDE_SONNET_4_6,
-            Llm.CLAUDE_OPUS_4_6,
-            Llm.CLAUDE_SONNET_4_6,
-        ]
+        expected = [Llm.CLAUDE_OPUS_4_6]
         assert models == expected
 
 
@@ -185,7 +201,7 @@ class TestModelSelectionOpenAIOnly:
 
     @pytest.mark.asyncio
     async def test_openai_only(self):
-        """OpenAI only: GPT 5.2 Codex (high/medium) only"""
+        """OpenAI only: create mode keeps the top single candidate only."""
         models = await self.model_selector.select_models(
             generation_type="create",
             input_mode="text",
@@ -194,12 +210,7 @@ class TestModelSelectionOpenAIOnly:
             gemini_api_key=None,
         )
 
-        expected = [
-            Llm.GPT_5_2_CODEX_HIGH,
-            Llm.GPT_5_2_CODEX_MEDIUM,
-            Llm.GPT_5_2_CODEX_HIGH,
-            Llm.GPT_5_2_CODEX_MEDIUM,
-        ]
+        expected = [Llm.GPT_5_2_CODEX_HIGH]
         assert models == expected
 
 
