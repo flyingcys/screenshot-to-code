@@ -333,6 +333,12 @@ Import 模式完全不调用后端生成。
 - 按不同 LLM Provider 统一抽象
 - 通过 tool-calling 让模型自己创建/编辑单文件 HTML
 
+更准确地说，它是：
+
+- **自研的 Python Agent 编排层**
+- **底层直接调用各家官方 Python SDK**
+- **不是基于 Claude Agent SDK / LangChain / LangGraph 这类高层 Agent 框架**
+
 主入口：
 
 - `backend/routes/generate_code.py` 中的 `AgenticGenerationStage`
@@ -392,7 +398,312 @@ Agent 的核心循环在：
 
 这本质上是一个标准的 agentic tool loop。
 
-### 7.5 Agent 并不直接操作真实文件系统
+### 7.5 这套 Agent 到底算不算“自己实现”
+
+这个问题要拆成两层看：
+
+1. **从 Agent 编排层看**
+   - 是项目自己实现的
+   - 核心证据是 `backend/agent/engine.py` 里的 `AgentEngine._run_with_session(...)`
+   - 这里自己实现了“发起一轮模型调用 -> 解析流式事件 -> 执行工具 -> 回填 tool result -> 再次调用模型”的完整闭环
+2. **从底层模型调用层看**
+   - 不是纯手写 HTTP
+   - 而是直接使用 OpenAI、Anthropic、Gemini 的官方 Python SDK
+
+所以最准确的理解是：
+
+- 上层是项目自己写的 Agent loop
+- 下层是官方 SDK + provider 适配层
+
+换句话说，这个仓库不是“用一个现成 Agent SDK 套起来”，而是：
+
+- 自己实现 agent 编排
+- 自己定义工具 schema
+- 自己处理多轮 tool-calling
+- 然后在 provider 层分别接 OpenAI / Anthropic / Gemini 官方 SDK
+
+### 7.6 官方 Python SDK 在哪里被调用
+
+这一节适合作为源码学习入口。
+
+#### 7.6.1 依赖声明
+
+后端依赖在：
+
+- `backend/pyproject.toml`
+
+可以直接看到：
+
+- `openai = "2.16.0"`
+- `anthropic = "^0.84.0"`
+- `google-genai = "^1.16.1"`
+
+这说明底层模型调用明确依赖了三家官方 Python SDK。
+
+#### 7.6.2 Provider 工厂：统一创建各家 SDK client
+
+文件：
+
+- `backend/agent/providers/factory.py`
+
+这是最关键的入口文件，因为它负责：
+
+1. 根据 `model` 判断当前应该走哪家 provider
+2. 创建对应官方 SDK client
+3. 返回统一接口的 `ProviderSession`
+
+这里可以直接看到三家 SDK 的初始化：
+
+- OpenAI：
+  - `client = AsyncOpenAI(api_key=openai_api_key, base_url=openai_base_url)`
+- Anthropic：
+  - `client = AsyncAnthropic(api_key=anthropic_api_key)`
+- Gemini：
+  - `client = genai.Client(api_key=gemini_api_key)`
+
+因此 `factory.py` 的角色是：
+
+- 上接统一 AgentEngine
+- 下接不同厂商 SDK client
+
+#### 7.6.3 OpenAI 官方 Python SDK 的调用点
+
+文件：
+
+- `backend/agent/providers/openai.py`
+
+这个文件值得重点读，因为它最完整地展示了“自研 agent loop 如何接 OpenAI SDK”。
+
+调用链分成几步：
+
+1. **创建 client**
+   - 在 `backend/agent/providers/factory.py`
+   - 使用 `AsyncOpenAI(...)`
+2. **把统一 message 转成 Responses API 输入**
+   - `backend/agent/providers/openai.py`
+   - `_convert_message_to_responses_input(...)`
+3. **真正发起模型请求**
+   - `OpenAIProviderSession.stream_turn(...)`
+   - 关键调用：
+     - `stream = await self._client.responses.create(**params)`
+4. **解析流式返回**
+   - `parse_event(...)`
+   - 解析 `response.output_text.delta`
+   - 解析 `response.reasoning_text.delta`
+   - 解析 `response.function_call_arguments.delta`
+5. **把工具结果送回下一轮**
+   - `append_tool_results(...)`
+   - 会把本地工具执行结果封装成 `function_call_output`
+
+也就是说，OpenAI 这条链路用的是：
+
+- 官方 `openai` Python SDK
+- Responses API
+- 流式事件
+- 自己实现的事件解析和多轮 agent loop
+
+#### 7.6.4 Anthropic 官方 Python SDK 的调用点
+
+文件：
+
+- `backend/agent/providers/anthropic/provider.py`
+
+调用链同样很清晰：
+
+1. **创建 client**
+   - 在 `backend/agent/providers/factory.py`
+   - 使用 `AsyncAnthropic(...)`
+2. **把统一 message 转成 Claude 需要的格式**
+   - `_convert_openai_messages_to_claude(...)`
+3. **真正发起模型请求**
+   - `AnthropicProviderSession.stream_turn(...)`
+   - 关键调用：
+     - `async with self._client.messages.stream(**stream_kwargs) as stream:`
+4. **解析 Claude 原生流式事件**
+   - `_parse_stream_event(...)`
+   - 解析 `thinking_delta`
+   - 解析 `text_delta`
+   - 解析 `input_json_delta`
+5. **从最终消息中提取 tool use**
+   - `_extract_tool_calls(...)`
+
+因此 Anthropic 这条链路说明：
+
+- 用的是官方 `anthropic` Python SDK
+- 不是 Claude Agent SDK
+- 只是把 Claude 的原生流式协议包进了项目自己的 provider 抽象
+
+#### 7.6.5 Gemini 官方 Python SDK 的调用点
+
+文件：
+
+- `backend/agent/providers/gemini.py`
+
+创建 client 的位置仍然在：
+
+- `backend/agent/providers/factory.py`
+- `client = genai.Client(api_key=gemini_api_key)`
+
+Gemini provider 的职责和另外两家一致，主要负责：
+
+- 把统一 prompt 结构转换成 Gemini 需要的输入格式
+- 发起 Gemini 请求
+- 解析 Gemini 返回内容
+- 把工具调用映射回统一 `ProviderTurn`
+
+学习时建议把它和 `openai.py`、`anthropic/provider.py` 对照读，这样更容易看出：
+
+- 三家官方 SDK 的接口差异
+- 项目是如何用统一抽象把这些差异包起来的
+
+#### 7.6.6 额外一处：图片生成也直接调用了 OpenAI SDK
+
+除了主 Agent 链路，仓库还有一处很直观的 OpenAI SDK 调用：
+
+- `backend/image_generation/generation.py`
+
+这里直接：
+
+- `from openai import AsyncOpenAI`
+- `client = AsyncOpenAI(api_key=api_key, base_url=base_url)`
+
+这说明仓库里不只是“代码生成主链路”用了 OpenAI 官方 SDK，连图片生成辅助能力也直接接了官方 SDK。
+
+#### 7.6.7 适合学习的阅读顺序
+
+如果你想系统理解这套实现，建议按下面顺序读：
+
+1. `backend/agent/runner.py`
+   - 看 `Agent` 只是 `AgentEngine` 的薄封装
+2. `backend/agent/engine.py`
+   - 看 agent loop 主体
+3. `backend/agent/providers/factory.py`
+   - 看三家官方 SDK client 如何被创建
+4. `backend/agent/providers/openai.py`
+   - 看 OpenAI Responses API 接法
+5. `backend/agent/providers/anthropic/provider.py`
+   - 看 Claude tool use / thinking 接法
+6. `backend/agent/providers/gemini.py`
+   - 看 Gemini 的 provider 适配
+7. `backend/agent/tools/runtime.py`
+   - 看本地工具是怎么被执行的
+8. `backend/agent/tools/definitions.py`
+   - 看暴露给模型的工具 schema
+
+这样更容易把三层分开理解：
+
+- Prompt / 业务层
+- Agent 编排层
+- 官方 SDK / Provider 协议层
+
+#### 7.6.8 一次真实请求的调用链导读图
+
+如果把一次 `/generate-code` 请求从入口一路跟到底，大致会经过下面这条链：
+
+```text
+前端 WebSocket 请求
+  -> backend/routes/generate_code.py
+  -> Pipeline / Middleware
+  -> build_prompt_messages(...)
+  -> AgenticGenerationStage._run_variant(...)
+  -> agent.runner.Agent
+  -> agent.engine.AgentEngine.run(...)
+  -> create_provider_session(...)
+  -> OpenAIProviderSession / AnthropicProviderSession / GeminiProviderSession
+  -> 官方 Python SDK 发起流式请求
+  -> provider 解析 thinking / assistant / tool call
+  -> AgentToolRuntime.execute(...)
+  -> create_file / edit_file / generate_images / remove_background / retrieve_option
+  -> tool result 回填 provider session
+  -> 继续下一轮模型调用
+  -> 最终返回 file_state.content
+  -> WebSocket 持续推送给前端
+```
+
+这条链里每一段各自负责的事情是：
+
+- `backend/routes/generate_code.py`
+  - 接 WebSocket
+  - 跑 pipeline
+  - 决定 variant 数量和模型组合
+- `build_prompt_messages(...)`
+  - 组装统一 prompt messages
+- `AgentEngine`
+  - 跑多轮 agent loop
+- `create_provider_session(...)`
+  - 选 provider，创建官方 SDK client
+- `ProviderSession`
+  - 调官方 SDK，解析原生流式事件
+- `AgentToolRuntime`
+  - 真正执行本地工具逻辑
+
+#### 7.6.9 按文件快速跳转：你读源码时该看什么
+
+如果你打开一个文件，不知道它在整条链里处于什么位置，可以按这张表理解：
+
+| 文件 | 角色 | 重点看什么 |
+| --- | --- | --- |
+| `backend/routes/generate_code.py` | 请求入口 / pipeline / variant 调度 | WebSocket 如何进入后端、什么时候启动 Agent |
+| `backend/prompts/pipeline.py` | Prompt 总装配入口 | create / update 分别如何组装 prompt |
+| `backend/agent/runner.py` | Agent 薄封装 | `Agent` 本身几乎没有额外逻辑 |
+| `backend/agent/engine.py` | Agent 主循环 | 多轮 provider 调用、事件转发、工具执行、结果回填 |
+| `backend/agent/providers/factory.py` | Provider 选择与 SDK client 创建 | 三家官方 SDK 在哪里初始化 |
+| `backend/agent/providers/openai.py` | OpenAI 适配层 | Responses API、流式事件解析、tool output 回填 |
+| `backend/agent/providers/anthropic/provider.py` | Claude 适配层 | messages.stream、thinking/tool use 解析 |
+| `backend/agent/providers/gemini.py` | Gemini 适配层 | generate_content_stream、多模态输入转换 |
+| `backend/agent/tools/definitions.py` | 工具 schema 定义 | 暴露给模型的函数签名 |
+| `backend/agent/tools/runtime.py` | 工具执行层 | `create_file` / `edit_file` / `generate_images` 等真实行为 |
+| `backend/image_generation/generation.py` | 图像生成辅助能力 | OpenAI SDK 在非主链路里的直接调用 |
+
+#### 7.6.10 如果你想仿写一个最小版，可以先抽象哪几层
+
+从这个项目反推，一个“最小可工作的自研 Agent”至少可以拆成 4 层：
+
+1. **请求入口层**
+   - 接收用户输入
+   - 生成统一 prompt messages
+2. **Agent loop 层**
+   - 调一次模型
+   - 看有没有 tool call
+   - 执行工具
+   - 把工具结果回填
+3. **Provider 适配层**
+   - 把统一 message 转成不同厂商需要的请求格式
+   - 调官方 SDK
+   - 把返回事件转回统一结构
+4. **Tool runtime 层**
+   - 真的去执行 `create_file` / `edit_file` 等动作
+
+这个仓库的价值就在于：
+
+- 没有把“agent”神秘化
+- 本质上就是一个清晰分层的多轮 tool-calling 调度器
+- 你可以很容易抽出最小闭环自己练手
+
+#### 7.6.11 建议你第一次阅读时重点盯住的 6 个函数
+
+如果第一次看源码不想铺太大，先只盯住下面 6 个函数，基本就能把主线串起来：
+
+1. `backend/routes/generate_code.py`
+   - `AgenticGenerationStage.process_variants(...)`
+2. `backend/routes/generate_code.py`
+   - `AgenticGenerationStage._run_variant(...)`
+3. `backend/agent/engine.py`
+   - `AgentEngine.run(...)`
+4. `backend/agent/engine.py`
+   - `AgentEngine._run_with_session(...)`
+5. `backend/agent/providers/factory.py`
+   - `create_provider_session(...)`
+6. `backend/agent/tools/runtime.py`
+   - `AgentToolRuntime.execute(...)`
+
+然后再按你感兴趣的 provider 往下钻：
+
+- 想学 OpenAI：继续看 `OpenAIProviderSession.stream_turn(...)`
+- 想学 Claude：继续看 `AnthropicProviderSession.stream_turn(...)`
+- 想学 Gemini：继续看 `GeminiProviderSession.stream_turn(...)`
+
+### 7.7 Agent 并不直接操作真实文件系统
 
 虽然工具名叫 `create_file` / `edit_file`，但默认不是改仓库磁盘文件，而是改内存里的文件状态：
 
@@ -405,7 +716,7 @@ Agent 的核心循环在：
 
 也就是说，Agent 的“文件”是逻辑文件，不是仓库物理文件。
 
-### 7.6 Agent 支持的工具
+### 7.8 Agent 支持的工具
 
 当前 canonical tools 包括：
 
@@ -427,7 +738,7 @@ Agent 的核心循环在：
 - `remove_background`：处理透明图
 - `retrieve_option`：读取某个 variant 的完整 HTML 供引用
 
-### 7.7 Provider 抽象方式
+### 7.9 Provider 抽象方式
 
 Provider 工厂：
 
@@ -447,7 +758,7 @@ Provider 实现：
 
 三家模型的差异被封装在 Provider 层，而不是污染上层业务逻辑。
 
-### 7.8 当前 Agent 的重要设计取向
+### 7.10 当前 Agent 的重要设计取向
 
 1. **单文件目标**
    - 主要目标是生成 `index.html`
